@@ -26,6 +26,8 @@ export function configStatus() {
     sessionSecret: Boolean(process.env.SESSION_SECRET),
     databaseUrl: Boolean(process.env.DATABASE_URL),
     // Aiven (and most hosted MySQL) need the CA certificate; a local database with DATABASE_SSL=off doesn't
-    databaseCaCert: process.env.DATABASE_SSL === "off" ? "not needed (SSL off)" : Boolean(process.env.DATABASE_CA_CERT || process.env.DATABASE_CA_CERT_FILE)
+    // A certificate is bundled in api/_lib/aiven-ca.js, so this setting is optional (see /api/health "ssl")
+    databaseCaCert: process.env.DATABASE_SSL === "off" ? "not needed (SSL off)"
+      : (process.env.DATABASE_CA_CERT || process.env.DATABASE_CA_CERT_FILE) ? true : "not set (using bundled)"
   };
 }
