@@ -1,0 +1,70 @@
+/* =========================================================
+   Checks .env.local for common mistakes:   npm run env:check
+   Shows setting NAMES and problems only, never the values,
+   so the output is safe to screenshot.
+   ========================================================= */
+import fs from "node:fs";
+
+const FILE = ".env.local";
+const REQUIRED = ["GOOGLE_CLIENT_ID", "SESSION_SECRET", "DATABASE_URL"];
+let problems = 0;
+const say = (ok, text) => { console.log(`${ok ? "✓" : "✗"} ${text}`); if (!ok) problems++; };
+
+if (!fs.existsSync(FILE)) {
+  say(false, `${FILE} not found in this folder. Run:  copy .env.example .env.local`);
+  process.exit(1);
+}
+
+const raw = fs.readFileSync(FILE);
+if (raw[0] === 0xff || raw[0] === 0xfe) say(false, "File is saved as UTF-16. In VS Code: click the encoding in the bottom bar > Save with Encoding > UTF-8");
+
+// What Node itself loads (same as npm run dev / db:setup)
+const loaded = {};
+try { Object.assign(loaded, process.loadEnvFile ? (process.loadEnvFile(FILE), process.env) : {}); } catch (err) { say(false, `Node can't read ${FILE}: ${err.message}`); }
+
+// What is written in the file (to compare)
+const written = {};
+for (const line of raw.toString("utf8").split(/\r?\n/)) {
+  const trimmed = line.trim();
+  if (!trimmed || trimmed.startsWith("#")) continue;
+  const eq = line.indexOf("=");
+  if (eq < 0) { say(false, `A line has no "=" sign (starts with "${trimmed.slice(0, 12)}…")`); continue; }
+  const name = line.slice(0, eq);
+  if (name !== name.trim()) say(false, `"${name}" has spaces around the name; remove them`);
+  written[name.trim()] = line.slice(eq + 1).trim();
+}
+
+for (const name of REQUIRED) {
+  const value = loaded[name] || "";
+  if (!(name in written)) say(false, `${name} is missing from the file`);
+  else if (!value) say(false, `${name} is in the file but Node reads it as EMPTY`);
+  else say(true, `${name} loaded (${value.length} characters)`);
+}
+
+// DATABASE_URL details
+const w = written.DATABASE_URL || "";
+const v = loaded.DATABASE_URL || "";
+const quoted = /^["'].*["']$/.test(w);
+if (w && /#/.test(w) && !quoted) say(false, `DATABASE_URL contains "#" (in the password?). Node cuts the line there. Put the whole value in double quotes: DATABASE_URL="mysql://..."`);
+if (w && v && w.replace(/^["']|["']$/g, "").length !== v.length) say(false, `DATABASE_URL in the file is ${w.length} characters but Node reads ${v.length}. Put the whole value in double quotes.`);
+if (v) {
+  say(v.startsWith("mysql://"), v.startsWith("mysql://") ? "DATABASE_URL starts with mysql://" : "DATABASE_URL should start with mysql:// (copy Aiven's Service URI)");
+  try {
+    const url = new URL(v);
+    say(Boolean(url.username && url.password), url.username && url.password ? "DATABASE_URL has a user and password" : "DATABASE_URL is missing the user or password");
+    say(Boolean(url.port), url.port ? "DATABASE_URL has a port number" : "DATABASE_URL is missing the :port number");
+    say(url.pathname.length > 1, url.pathname.length > 1 ? "DATABASE_URL has a database name" : "DATABASE_URL is missing the database name at the end (Aiven: /defaultdb)");
+  } catch (err) {
+    say(false, "DATABASE_URL isn't a valid address. Copy Aiven's Service URI again.");
+  }
+}
+
+// Certificate
+const caFile = loaded.DATABASE_CA_CERT_FILE;
+if (loaded.DATABASE_SSL === "off") say(true, "SSL is off (only for a database on this computer)");
+else if (loaded.DATABASE_CA_CERT) say(true, "DATABASE_CA_CERT is set");
+else if (caFile) say(fs.existsSync(caFile), fs.existsSync(caFile) ? `Certificate file found (${caFile})` : `Certificate file "${caFile}" not found. Download ca.pem from Aiven into this folder.`);
+else say(false, "No certificate: set DATABASE_CA_CERT_FILE=ca.pem and put Aiven's ca.pem in this folder");
+
+console.log(problems ? `\n${problems} problem(s) found.` : "\nAll good. Next: npm run db:setup");
+process.exitCode = problems ? 1 : 0;
