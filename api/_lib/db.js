@@ -10,17 +10,26 @@ import { requireEnv } from "./config.js";
 
 let pool = null;
 
+// Certificates pasted into Vercel (or .env files) often lose their line breaks,
+// gain spaces or quotes. Rebuild them in the exact format TLS expects.
+export function normalizeCertificate(raw) {
+  let text = String(raw || "").trim().replace(/^["']+|["']+$/g, "").replace(/\\n/g, "\n").replace(/\r/g, "");
+  const blocks = text.match(/-----BEGIN CERTIFICATE-----[\s\S]*?-----END CERTIFICATE-----/g);
+  if (!blocks) return text; // not a PEM certificate: let TLS report the problem
+  return blocks.map((block) => {
+    const body = block.replace(/-----(BEGIN|END) CERTIFICATE-----/g, "").replace(/[^A-Za-z0-9+/=]/g, "");
+    return `-----BEGIN CERTIFICATE-----\n${body.match(/.{1,64}/g).join("\n")}\n-----END CERTIFICATE-----`;
+  }).join("\n") + "\n";
+}
+
 function sslOptions() {
   if (process.env.DATABASE_SSL === "off") return undefined; // local MySQL without SSL only
   let ca = process.env.DATABASE_CA_CERT;
-  if (ca) {
-    // .env files keep the certificate on one line with "\n"; turn those back into line breaks
-    ca = ca.replace(/\\n/g, "\n");
-  } else if (process.env.DATABASE_CA_CERT_FILE) {
+  if (!ca && process.env.DATABASE_CA_CERT_FILE) {
     // On your computer: path to the downloaded ca.pem (easier than pasting it)
     ca = fs.readFileSync(process.env.DATABASE_CA_CERT_FILE, "utf8");
   }
-  return ca ? { ca, rejectUnauthorized: true } : { rejectUnauthorized: true };
+  return ca ? { ca: normalizeCertificate(ca), rejectUnauthorized: true } : { rejectUnauthorized: true };
 }
 
 export function getPool() {

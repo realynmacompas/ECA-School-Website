@@ -16,10 +16,13 @@ export default handler(async (req, res) => {
       await query("SELECT 1 FROM admins LIMIT 1");
       database = "connected";
     } catch (err) {
-      // Show a short reason without exposing passwords or host names
-      database = err.code === "ER_NO_SUCH_TABLE"
-        ? "connected, but tables are missing: run npm run db:setup"
-        : `can't connect (${err.code || "error"})`;
+      // Full details go to the server log (Vercel > Logs); the page gets a short reason + hint
+      console.error("[health] database error:", err.code, err.message);
+      database = `can't connect (${err.code || "error"})`;
+      if (err.code === "ER_NO_SUCH_TABLE") database = "connected, but tables are missing: run npm run db:setup";
+      else if (/SSL|certificate|CERT/i.test(`${err.code} ${err.message}`)) database += ": check DATABASE_CA_CERT (Aiven > Overview > CA certificate)";
+      else if (err.code === "ER_ACCESS_DENIED_ERROR") database += ": check the user/password in DATABASE_URL";
+      else if (["ENOTFOUND", "ETIMEDOUT", "ECONNREFUSED"].includes(err.code)) database += ": check the host/port in DATABASE_URL and that the Aiven service is running";
     }
   }
 
