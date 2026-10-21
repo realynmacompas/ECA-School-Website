@@ -43,7 +43,7 @@ Based on common school website practice (SchoolStatus, Wix, Realsmart, Ubiq Educ
 | Accessibility | Text size (A−/A/A+), high-contrast mode, skip link, alt text, keyboard support, visible focus, WCAG AA color contrast, reduced-motion support |
 | Priority links | Admissions, School Calendar, Faculty & Staff Directory, Contact in tiles, menu, and footer |
 | Visual storytelling | Real photos in the hero, programs, and Life at ECA gallery |
-| Portals | "Portal Login" in the top bar and footer (page not built yet) |
+| Portals | "Parent & Student Portal" in the footer (page not built yet). The staff admin login is not linked from the public site |
 | Policies | Footer "School Policies": Data Privacy Notice, Child Protection Policy, Anti-Bullying Policy, Student Handbook |
 
 Not included yet: a second language (Filipino) and a campus video / virtual tour. Add them when
@@ -82,3 +82,32 @@ These pages are linked from the homepage but don't exist yet:
 - `faculty.html` (faculty and staff directory; ask the school which details may be published)
 - `policies.html` (data privacy notice, child protection policy, anti-bullying policy, student handbook)
 - `portal.html` (a real parent/student portal needs a backend, e.g. PHP + MySQL, with secure login)
+
+## Admin sign-in (Google)
+
+Staff sign in at `/admin/login.html` with **Google only** (no passwords on this site).
+The page is not linked from the public site; staff should bookmark it.
+
+Settings are in `admin/js/auth-config.js`:
+
+- `GOOGLE_CLIENT_ID`: the Web application OAuth Client ID from Google Cloud Console
+  (not a secret; never put the Client Secret in this project)
+- `ALLOWED_ADMIN_EMAILS`: the Google accounts allowed into the dashboard
+- `ALLOWED_ADMIN_DOMAINS` (optional): a Google Workspace domain the school owns
+
+Google Cloud Console > Credentials > the OAuth client must list these
+**Authorized JavaScript origins**:
+
+```
+https://eca-school-website.vercel.app
+http://localhost:5500
+http://127.0.0.1:5500
+```
+
+Sessions last 8 hours and end when the tab is closed (`ADMIN_SESSION_HOURS`).
+
+**Security note:** the staff-list check runs in the browser, so it only keeps
+honest visitors out. That is fine while the admin saves to the browser (demo mode).
+When the admin saves to a real server, the server must verify the Google ID token
+(signature, audience, expiry) and the email on every request. The token is kept in
+the session (`session.credential` in `admin/js/auth.js`) for that.
