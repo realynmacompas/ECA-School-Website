@@ -5,8 +5,10 @@
    Switching to the school's MySQL later = change those values.
    ========================================================= */
 import fs from "node:fs";
+import crypto from "node:crypto";
 import mysql from "mysql2/promise";
 import { requireEnv } from "./config.js";
+import { BUNDLED_CA_CERT } from "./aiven-ca.js";
 
 let pool = null;
 
@@ -22,14 +24,53 @@ export function normalizeCertificate(raw) {
   }).join("\n") + "\n";
 }
 
+function describeCertificate(pem) {
+  try {
+    const cert = new crypto.X509Certificate(pem);
+    return { valid: true, subject: cert.subject.replace(/^CN=/, ""), validTo: cert.validTo };
+  } catch (err) {
+    return { valid: false };
+  }
+}
+
+// Which CA certificate to trust, and where it came from (shown by /api/health).
+// Order: DATABASE_CA_CERT setting → DATABASE_CA_CERT_FILE → certificate bundled in aiven-ca.js.
+// A setting that isn't a valid certificate is skipped (with a note) instead of breaking the connection.
+export function chooseCertificate({ setting, file, bundled } = {
+  setting: process.env.DATABASE_CA_CERT,
+  file: process.env.DATABASE_CA_CERT_FILE,
+  bundled: BUNDLED_CA_CERT
+}) {
+  const notes = [];
+  if (setting) {
+    const pem = normalizeCertificate(setting);
+    const info = describeCertificate(pem);
+    if (info.valid) return { pem, source: "DATABASE_CA_CERT setting", ...info, notes };
+    notes.push("DATABASE_CA_CERT is set but isn't a valid certificate, so it was ignored");
+  }
+  if (file) {
+    try {
+      const pem = normalizeCertificate(fs.readFileSync(file, "utf8"));
+      const info = describeCertificate(pem);
+      if (info.valid) return { pem, source: `file ${file}`, ...info, notes };
+      notes.push(`${file} isn't a valid certificate, so it was ignored`);
+    } catch (err) {
+      notes.push(`${file} couldn't be read (${err.code || "error"}), so it was ignored`);
+    }
+  }
+  if (bundled) {
+    const pem = normalizeCertificate(bundled);
+    const info = describeCertificate(pem);
+    if (info.valid) return { pem, source: "bundled (api/_lib/aiven-ca.js)", ...info, notes };
+  }
+  return { pem: "", source: "none", valid: false, notes };
+}
+
 function sslOptions() {
   if (process.env.DATABASE_SSL === "off") return undefined; // local MySQL without SSL only
-  let ca = process.env.DATABASE_CA_CERT;
-  if (!ca && process.env.DATABASE_CA_CERT_FILE) {
-    // On your computer: path to the downloaded ca.pem (easier than pasting it)
-    ca = fs.readFileSync(process.env.DATABASE_CA_CERT_FILE, "utf8");
-  }
-  return ca ? { ca: normalizeCertificate(ca), rejectUnauthorized: true } : { rejectUnauthorized: true };
+  const chosen = chooseCertificate();
+  chosen.notes.forEach((note) => console.warn(`[db] ${note}`));
+  return chosen.pem ? { ca: chosen.pem, rejectUnauthorized: true } : { rejectUnauthorized: true };
 }
 
 export function getPool() {
