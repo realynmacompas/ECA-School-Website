@@ -1,0 +1,6 @@
+# Files only used on a computer, never served by the website
+scripts
+db
+.env*
+!.env.example
+*.pem

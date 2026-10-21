@@ -1119,3 +1119,11 @@ summary:focus-visible { outline: 3px solid var(--gold-500); outline-offset: 3px;
 .google-signin__loading { text-align: center; color: var(--muted); font-size: .95rem; }
 .google-signin__loading[hidden] { display: none; }
 .alert code { font-size: .9em; overflow-wrap: anywhere; }
+
+/* Admin pages stay hidden until the server confirms the sign-in (layout.js) */
+.auth-pending .admin { visibility: hidden; }
+
+/* Signed-in user box: name + email on one row, "Log out" on its own row below */
+.sidebar__user { flex-wrap: wrap; }
+.sidebar__user-name span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sidebar__logout { flex-basis: 100%; border: 1px solid rgba(245, 215, 126, .3); }

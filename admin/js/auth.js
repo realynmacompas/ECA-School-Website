@@ -1,26 +1,60 @@
 /* =========================================================
-   ECA Admin - sign-in session helpers
-   Used by the login page and by layout.js on every admin page.
-   Settings (Client ID, allowed emails) are in auth-config.js.
+   ECA Admin - talking to the sign-in back end (/api/auth)
 
-   HOW IT WORKS
-   - Google's button gives us a signed "ID token" (credential)
-     that says who the person is (email, name, picture).
-   - We check that the email is on the staff list, then keep
-     a session in sessionStorage (closing the tab signs out).
+   HOW SIGN-IN WORKS
+   1. Google's button gives the login page a signed ID token.
+   2. adminSignIn() sends it to /api/auth/login. The SERVER
+      checks it with Google and looks the email up in the
+      admins table. Only then does it set a secure session
+      cookie (HttpOnly: page scripts can't read it).
+   3. Every admin page asks /api/auth/me "who is signed in?"
+      (layout.js). No valid session → back to the login page.
 
-   IMPORTANT - what this does NOT protect yet
-   Checks that run in the browser can be skipped by anyone
-   using the browser's developer tools. That is acceptable
-   while the admin only saves to this browser (store.js demo
-   mode). When the admin starts saving to a real server, the
-   server must verify the Google token's signature and the
-   email on every save. The token is kept in the session
-   (session.credential) so it can be sent to the server then.
+   The staff list and all checks are on the server, so they
+   can't be skipped with the browser's developer tools.
    ========================================================= */
 
-const ADMIN_SESSION_KEY = "ecaAdminSession";
-const GOOGLE_ISSUERS = ["accounts.google.com", "https://accounts.google.com"];
+const ADMIN_API_HEADERS = {
+  "Content-Type": "application/json",
+  "X-ECA-Admin": "1" // the server rejects admin changes without this header
+};
+
+class AdminApiError extends Error {
+  constructor(message, status, code) {
+    super(message);
+    this.status = status;
+    this.code = code || "";
+  }
+}
+
+// Calls the back end and returns the JSON answer, or throws AdminApiError
+async function adminApi(path, { method = "GET", body } = {}) {
+  let response;
+  try {
+    response = await fetch(path, {
+      method,
+      headers: method === "GET" ? { "X-ECA-Admin": "1" } : ADMIN_API_HEADERS,
+      body: body === undefined ? undefined : JSON.stringify(body),
+      credentials: "same-origin",
+      cache: "no-store"
+    });
+  } catch (err) {
+    throw new AdminApiError("Can't reach the server. Check your internet connection and try again.", 0, "NETWORK");
+  }
+
+  let data = {};
+  try { data = await response.json(); } catch (err) { /* not JSON (e.g. 404 page) */ }
+
+  if (!response.ok) {
+    let message = data.error || "Something went wrong. Please try again.";
+    // Opened with Live Server, which can't run the /api back end
+    if (response.status === 404 || response.status === 405) {
+      message = "The admin back end isn't running here. On your computer, use \"npm run dev\" instead of Live Server.";
+    }
+    throw new AdminApiError(message, response.status, data.code);
+  }
+  return data;
+}
 
 function isGoogleConfigured() {
   return typeof GOOGLE_CLIENT_ID === "string"
@@ -28,78 +62,21 @@ function isGoogleConfigured() {
     && !GOOGLE_CLIENT_ID.startsWith("PASTE-");
 }
 
-function normalizeList(list) {
-  return (Array.isArray(list) ? list : []).map((item) => String(item).trim().toLowerCase()).filter(Boolean);
+// Login page: send Google's ID token to the server. Returns { admin, expiresAt }.
+function adminSignIn(credential) {
+  return adminApi("/api/auth/login", { method: "POST", body: { credential } });
 }
 
-// hostedDomain is Google's "hd" value: only set for Google Workspace accounts
-function isAllowedAdmin(email, hostedDomain) {
-  const cleanEmail = String(email || "").trim().toLowerCase();
-  if (!cleanEmail) return false;
-  if (normalizeList(ALLOWED_ADMIN_EMAILS).includes(cleanEmail)) return true;
-  const domain = String(hostedDomain || "").toLowerCase();
-  return Boolean(domain) && normalizeList(ALLOWED_ADMIN_DOMAINS).includes(domain);
-}
-
-// Reads the middle part of Google's ID token (header.PAYLOAD.signature).
-// This does NOT check the signature; the server will do that later.
-function decodeGoogleCredential(credential) {
-  const part = String(credential || "").split(".")[1];
-  if (!part) throw new Error("Not a Google ID token");
-  const base64 = part.replace(/-/g, "+").replace(/_/g, "/").padEnd(Math.ceil(part.length / 4) * 4, "=");
-  const bytes = Uint8Array.from(atob(base64), (ch) => ch.charCodeAt(0));
-  return JSON.parse(new TextDecoder().decode(bytes)); // TextDecoder keeps names like "Peñaflor" intact
-}
-
-// The checks a browser can do on the token. Returns an error message, or "" if OK.
-function checkGoogleProfile(profile) {
-  const nowSeconds = Date.now() / 1000;
-  if (!GOOGLE_ISSUERS.includes(profile.iss) || profile.aud !== GOOGLE_CLIENT_ID) {
-    return "This sign-in didn't come from the school's Google setup. Please try again.";
+// Admin pages: who is signed in? Returns { admin, expiresAt } or null (signed out).
+async function fetchCurrentAdmin() {
+  try {
+    return await adminApi("/api/auth/me");
+  } catch (err) {
+    if (err.status === 401) return null;
+    throw err;
   }
-  if (!profile.exp || profile.exp < nowSeconds) {
-    return "Your Google sign-in expired. Please try again.";
-  }
-  if (!profile.email || profile.email_verified !== true) {
-    return "This Google account's email address isn't verified, so it can't be used.";
-  }
-  return "";
 }
 
-/* ---------- Session (sessionStorage) ---------- */
-function saveAdminSession(profile, credential) {
-  const now = Date.now();
-  const session = {
-    email: String(profile.email).toLowerCase(),
-    name: profile.name || "",
-    picture: profile.picture || "",
-    hd: profile.hd || "",
-    credential,
-    signedInAt: now,
-    expiresAt: now + ADMIN_SESSION_HOURS * 60 * 60 * 1000
-  };
-  // Throws if the browser blocks storage; the login page shows a message
-  sessionStorage.setItem(ADMIN_SESSION_KEY, JSON.stringify(session));
-  return session;
-}
-
-function clearAdminSession() {
-  try { sessionStorage.removeItem(ADMIN_SESSION_KEY); } catch (err) { /* storage blocked */ }
-}
-
-function hasStoredAdminSession() {
-  try { return sessionStorage.getItem(ADMIN_SESSION_KEY) !== null; } catch (err) { return false; }
-}
-
-// The signed-in staff member, or null. Also signs out sessions that expired
-// or whose email was removed from the staff list since they signed in.
-function readAdminSession() {
-  let session = null;
-  try { session = JSON.parse(sessionStorage.getItem(ADMIN_SESSION_KEY)); } catch (err) { return null; }
-  if (!session || !session.email) return null;
-  if (Date.now() > session.expiresAt || !isAllowedAdmin(session.email, session.hd)) {
-    clearAdminSession();
-    return null;
-  }
-  return session;
+async function adminSignOut() {
+  try { await adminApi("/api/auth/logout", { method: "POST", body: {} }); } catch (err) { /* cookie expires anyway */ }
 }

@@ -83,31 +83,72 @@ These pages are linked from the homepage but don't exist yet:
 - `policies.html` (data privacy notice, child protection policy, anti-bullying policy, student handbook)
 - `portal.html` (a real parent/student portal needs a backend, e.g. PHP + MySQL, with secure login)
 
+## Back end (Vercel Functions + MySQL)
+
+The `api/` folder is the back end. Vercel runs each file as a web address
+(`api/auth/login.js` → `/api/auth/login`); files in `api/_lib/` are shared helpers.
+
+```
+api/
+  _lib/        config, MySQL connection, session cookie, Google check, helpers
+  auth/        login.js, me.js, logout.js
+  health.js    /api/health: is everything set up?
+db/schema.sql  database tables
+scripts/       db.js (tables + staff list), dev-server.js (local testing)
+.env.example   list of settings (copy to .env.local)
+```
+
+### Settings
+
+All accounts and passwords are **settings, not code** (see `.env.example`):
+`GOOGLE_CLIENT_ID`, `SESSION_SECRET`, `SESSION_HOURS`, `DATABASE_URL`, `DATABASE_CA_CERT`.
+
+- On Vercel: Project > Settings > Environment Variables
+- On your computer: a `.env.local` file (never committed)
+
+Switching from personal accounts to the school's later means changing these values,
+then running `npm run db:setup` and `npm run admin:add` on the new database.
+
+### Run it on your computer
+
+Needs Node.js 20.6 or newer.
+
+```
+npm install
+copy .env.example .env.local     (then fill it in)
+npm run db:setup                 creates the tables
+npm run admin:add -- you@gmail.com
+npm run dev                      → http://localhost:5500
+```
+
+Use `npm run dev`, not VS Code Live Server: Live Server can't run the `/api` back end.
+Check the set-up any time at `/api/health`.
+
+### Staff list
+
+```
+npm run admin:add -- name@gmail.com
+npm run admin:remove -- name@gmail.com
+npm run admin:list
+```
+
 ## Admin sign-in (Google)
 
 Staff sign in at `/admin/login.html` with **Google only** (no passwords on this site).
 The page is not linked from the public site; staff should bookmark it.
 
-Settings are in `admin/js/auth-config.js`:
+1. Google's button gives the page a signed ID token.
+2. `/api/auth/login` verifies it with Google (signature, expiry, our Client ID) and
+   checks the email in the `admins` table.
+3. The server sets an 8-hour session cookie (`eca_admin`: HttpOnly, SameSite=Lax,
+   Secure on https, signed with `SESSION_SECRET`).
+4. Every admin page asks `/api/auth/me`; removed staff lose access right away.
 
-- `GOOGLE_CLIENT_ID`: the Web application OAuth Client ID from Google Cloud Console
-  (not a secret; never put the Client Secret in this project)
-- `ALLOWED_ADMIN_EMAILS`: the Google accounts allowed into the dashboard
-- `ALLOWED_ADMIN_DOMAINS` (optional): a Google Workspace domain the school owns
-
-Google Cloud Console > Credentials > the OAuth client must list these
-**Authorized JavaScript origins**:
+The front end only needs the Client ID (`admin/js/auth-config.js`). Google Cloud >
+Credentials > the OAuth client must list these **Authorized JavaScript origins**:
 
 ```
 https://eca-school-website.vercel.app
 http://localhost:5500
 http://127.0.0.1:5500
 ```
-
-Sessions last 8 hours and end when the tab is closed (`ADMIN_SESSION_HOURS`).
-
-**Security note:** the staff-list check runs in the browser, so it only keeps
-honest visitors out. That is fine while the admin saves to the browser (demo mode).
-When the admin saves to a real server, the server must verify the Google ID token
-(signature, audience, expiry) and the email on every request. The token is kept in
-the session (`session.credential` in `admin/js/auth.js`) for that.

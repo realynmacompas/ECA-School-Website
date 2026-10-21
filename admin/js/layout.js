@@ -31,34 +31,48 @@ function icon(name, size = 20) {
 }
 
 /* ---------- Sign-in check ----------
-   Uses the Google sign-in session from auth.js. Pages that aren't
-   signed in (or whose session ended) go back to the login page.
-   Not real security on its own: see the note at the top of auth.js. */
-const SESSION_CHECK_INTERVAL = 60 * 1000; // re-check every minute while a page is open
+   Asks the server (/api/auth/me, in auth.js) who is signed in.
+   The page stays hidden until the server says yes; otherwise
+   the person goes back to the login page. */
+const SESSION_CHECK_INTERVAL = 5 * 60 * 1000; // re-check every 5 minutes while a page is open
 
-function requireSignIn() {
-  const hadSession = hasStoredAdminSession();
-  const session = readAdminSession();
-  if (!session) window.location.replace(hadSession ? "login.html?expired=1" : "login.html");
-  return session;
+// Hide the admin until the server confirms the sign-in (see .auth-pending in admin.css)
+document.documentElement.classList.add("auth-pending");
+
+async function requireSignIn() {
+  try {
+    const result = await fetchCurrentAdmin();
+    if (!result) {
+      window.location.replace("login.html?expired=1");
+      return null;
+    }
+    return result.admin;
+  } catch (err) {
+    // Server not reachable or not set up: show why on the login page
+    window.location.replace(`login.html?error=${encodeURIComponent(err.message)}`);
+    return null;
+  }
 }
 
-function signOut() {
-  clearAdminSession();
+async function signOut() {
+  await adminSignOut();
   window.location.href = "login.html?signedout=1";
 }
 
 // Sends the person to the login page if the session ends while the page is open
 function watchSession() {
-  setInterval(() => {
-    if (!readAdminSession()) window.location.replace("login.html?expired=1");
+  setInterval(async () => {
+    try {
+      if (!(await fetchCurrentAdmin())) window.location.replace("login.html?expired=1");
+    } catch (err) { /* offline for a moment: try again next time */ }
   }, SESSION_CHECK_INTERVAL);
 }
 
 /* ---------- Build the layout ---------- */
-function renderLayout() {
-  const session = requireSignIn();
+async function renderLayout() {
+  const session = await requireSignIn();
   if (!session) return;
+  document.documentElement.classList.remove("auth-pending");
   watchSession();
 
   const activePage = document.body.dataset.page;
