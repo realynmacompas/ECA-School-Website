@@ -30,30 +30,39 @@ function icon(name, size = 20) {
     stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name]}</svg>`;
 }
 
-/* ---------- Demo sign-in check ----------
-   Not real security (see login.js). Supabase will replace this. */
-function getSignedInUser() {
-  try { return sessionStorage.getItem("ecaAdminDemo"); } catch (err) { return null; }
-}
+/* ---------- Sign-in check ----------
+   Uses the Google sign-in session from auth.js. Pages that aren't
+   signed in (or whose session ended) go back to the login page.
+   Not real security on its own: see the note at the top of auth.js. */
+const SESSION_CHECK_INTERVAL = 60 * 1000; // re-check every minute while a page is open
 
 function requireSignIn() {
-  const user = getSignedInUser();
-  if (!user) window.location.replace("login.html");
-  return user;
+  const hadSession = hasStoredAdminSession();
+  const session = readAdminSession();
+  if (!session) window.location.replace(hadSession ? "login.html?expired=1" : "login.html");
+  return session;
 }
 
 function signOut() {
-  try { sessionStorage.removeItem("ecaAdminDemo"); } catch (err) { /* storage blocked */ }
-  window.location.href = "login.html";
+  clearAdminSession();
+  window.location.href = "login.html?signedout=1";
+}
+
+// Sends the person to the login page if the session ends while the page is open
+function watchSession() {
+  setInterval(() => {
+    if (!readAdminSession()) window.location.replace("login.html?expired=1");
+  }, SESSION_CHECK_INTERVAL);
 }
 
 /* ---------- Build the layout ---------- */
 function renderLayout() {
-  const user = requireSignIn();
-  if (!user) return;
+  const session = requireSignIn();
+  if (!session) return;
+  watchSession();
 
   const activePage = document.body.dataset.page;
-  const displayName = user.split("@")[0];
+  const displayName = session.name || session.email.split("@")[0];
   const initial = displayName.charAt(0).toUpperCase();
 
   const navLinks = NAV_ITEMS.map((item) => {
@@ -79,7 +88,7 @@ function renderLayout() {
       <a href="../index.html" target="_blank" rel="noopener" class="sidebar__website">${icon("external", 18)}View the website</a>
       <div class="sidebar__user">
         <span class="avatar" aria-hidden="true">${escapeHTML(initial)}</span>
-        <div class="sidebar__user-name"><strong>${escapeHTML(displayName)}</strong><span>Admin</span></div>
+        <div class="sidebar__user-name"><strong>${escapeHTML(displayName)}</strong><span title="${escapeHTML(session.email)}">${escapeHTML(session.email)}</span></div>
         <button type="button" class="sidebar__logout" data-action="sign-out">Log out</button>
       </div>
     </div>`;
@@ -90,7 +99,7 @@ function renderLayout() {
     <div class="account">
       <button type="button" class="avatar avatar--button" id="accountButton" aria-expanded="false" aria-controls="accountMenu" aria-label="Account menu">${escapeHTML(initial)}</button>
       <div class="account__menu" id="accountMenu" hidden>
-        <p class="account__name">Signed in as<br><strong>${escapeHTML(user)}</strong></p>
+        <p class="account__name">Signed in as<br><strong>${escapeHTML(session.email)}</strong></p>
         <a href="../index.html" target="_blank" rel="noopener">View the website</a>
         <button type="button" data-action="sign-out">Log out</button>
       </div>

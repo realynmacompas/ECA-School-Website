@@ -1109,3 +1109,13 @@ summary:focus-visible { outline: 3px solid var(--gold-500); outline-offset: 3px;
 @media (max-width: 640px) {
   .ann-switch { border-radius: var(--radius-sm); }
 }
+
+/* =========================================================
+   Google sign-in (login page)
+   ========================================================= */
+.google-signin { display: flex; flex-direction: column; align-items: stretch; gap: 8px; }
+.google-signin[hidden] { display: none; }
+.google-signin__button { display: flex; justify-content: center; min-height: 44px; }
+.google-signin__loading { text-align: center; color: var(--muted); font-size: .95rem; }
+.google-signin__loading[hidden] { display: none; }
+.alert code { font-size: .9em; overflow-wrap: anywhere; }

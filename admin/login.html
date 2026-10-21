@@ -33,55 +33,49 @@
     </aside>
 
     <main class="login__main">
-      <form class="login__form" id="loginForm" novalidate>
+      <div class="login__form">
         <div>
           <h1 class="page-title">Sign in</h1>
           <p style="margin-top: 6px; color: var(--muted);">For authorized ECA staff only.</p>
         </div>
 
-        <!-- Shown when sign-in fails -->
+        <!-- Shown after signing out or when the session ended -->
+        <div class="alert alert--info" id="loginNotice" role="status" hidden>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+          <span id="loginNoticeText"></span>
+        </div>
+
+        <!-- Shown when sign-in fails or the account is not on the staff list -->
         <div class="alert alert--error" id="loginError" role="alert" hidden>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 8v5M12 16h.01"/></svg>
-          <span id="loginErrorText">Wrong email or password. Please try again.</span>
+          <span id="loginErrorText"></span>
         </div>
 
-        <div class="field" id="emailField">
-          <label class="field__label" for="email">Email address</label>
-          <input class="input" id="email" name="email" type="email" autocomplete="username" required aria-describedby="emailError">
-          <span class="field__error" id="emailError">Please enter a valid email address.</span>
+        <!-- Google draws its "Sign in with Google" button in here (js/login.js) -->
+        <div class="google-signin" id="googleSignin">
+          <div class="google-signin__button" id="googleButton"></div>
+          <p class="google-signin__loading" id="googleLoading">Loading Google sign-in&hellip;</p>
         </div>
 
-        <div class="field" id="passwordField">
-          <label class="field__label" for="password">Password</label>
-          <div class="password-wrap">
-            <input class="input" id="password" name="password" type="password" autocomplete="current-password" required aria-describedby="passwordError">
-            <button type="button" class="password-toggle" id="passwordToggle" aria-controls="password" aria-pressed="false">Show</button>
-          </div>
-          <span class="field__error" id="passwordError">Please enter your password.</span>
+        <!-- Shown only until the Client ID is added to js/auth-config.js -->
+        <div class="alert alert--demo" id="setupNotice" hidden>
+          <span><strong>Google sign-in isn't set up yet.</strong> Add the school's Google Client ID and the staff email list to <code>admin/js/auth-config.js</code>.</span>
         </div>
-
-        <div class="login__row">
-          <label class="checkbox"><input type="checkbox" id="remember" checked>Keep me signed in</label>
-          <a href="#" id="forgotLink">Forgot password?</a>
-        </div>
-
-        <button type="submit" class="btn btn--primary btn--block btn--lg" id="loginButton">Sign in</button>
 
         <div class="alert alert--info">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
-          <span>Having trouble signing in? Ask the website administrator to reset your password.</span>
-        </div>
-
-        <!-- DEMO MODE: remove this box once Supabase sign-in is connected -->
-        <div class="alert alert--demo">
-          <span><strong>Demo mode:</strong> sign-in is not connected yet. Any valid email and a password of 8+ characters will open the dashboard.</span>
+          <span>Use the Google account the school approved for you. Can't get in? Ask the website administrator to add your email to the staff list.</span>
         </div>
 
         <a class="login__back" href="../index.html">&larr; Back to the school website</a>
-      </form>
+      </div>
     </main>
   </div>
 
+  <!-- Order matters: settings → session helpers → this page → Google's library -->
+  <script src="js/auth-config.js"></script>
+  <script src="js/auth.js"></script>
   <script src="js/login.js"></script>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </body>
 </html>

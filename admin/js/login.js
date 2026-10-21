@@ -1,114 +1,139 @@
 /* =========================================================
-   ECA Admin - Sign in page
+   ECA Admin - Sign in page (Google only)
 
-   DEMO MODE: there is no real account check yet. This file only
-   validates the form and then opens the dashboard. Real sign-in
-   will be done with Supabase Auth in a later step (see signIn()).
-   Never put real passwords or an "admin password" in JavaScript:
-   anyone can read front-end code in the browser.
+   1. Google's library draws the "Sign in with Google" button.
+   2. The person picks their Google account in Google's popup.
+      (Passwords, 2-step verification and blocking repeated
+      attempts are all handled by Google, not by this site.)
+   3. Google calls onGoogleCredential() with an ID token.
+   4. We check the token and the staff list (auth.js), save
+      the session and open the dashboard.
    ========================================================= */
 
-const form = document.getElementById("loginForm");
-const emailInput = document.getElementById("email");
-const passwordInput = document.getElementById("password");
-const passwordToggle = document.getElementById("passwordToggle");
-const loginButton = document.getElementById("loginButton");
-const loginError = document.getElementById("loginError");
-const loginErrorText = document.getElementById("loginErrorText");
+const els = {
+  button: document.getElementById("googleButton"),
+  loading: document.getElementById("googleLoading"),
+  signin: document.getElementById("googleSignin"),
+  setup: document.getElementById("setupNotice"),
+  error: document.getElementById("loginError"),
+  errorText: document.getElementById("loginErrorText"),
+  notice: document.getElementById("loginNotice"),
+  noticeText: document.getElementById("loginNoticeText")
+};
 
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const MIN_PASSWORD_LENGTH = 8;
+const GOOGLE_LOAD_TIMEOUT = 10000; // ms before we say the Google library didn't load
+let googleStarted = false;
 
-/* ---------- Show / hide password ---------- */
-passwordToggle.addEventListener("click", () => {
-  const isHidden = passwordInput.type === "password";
-  passwordInput.type = isHidden ? "text" : "password";
-  passwordToggle.textContent = isHidden ? "Hide" : "Show";
-  passwordToggle.setAttribute("aria-pressed", String(isHidden));
-  passwordInput.focus();
-});
-
-/* ---------- Validation helpers ---------- */
-function setFieldError(input, hasError) {
-  const field = input.closest(".field");
-  field.classList.toggle("field--error", hasError);
-  input.setAttribute("aria-invalid", String(hasError));
+function showError(message) {
+  els.errorText.textContent = message;
+  els.error.hidden = false;
+  els.notice.hidden = true;
 }
 
-function validateForm() {
-  const email = emailInput.value.trim();
-  const password = passwordInput.value;
-
-  const emailOk = EMAIL_PATTERN.test(email);
-  const passwordOk = password.length > 0;
-
-  setFieldError(emailInput, !emailOk);
-  setFieldError(passwordInput, !passwordOk);
-
-  // Put the cursor on the first field that needs fixing
-  if (!emailOk) emailInput.focus();
-  else if (!passwordOk) passwordInput.focus();
-
-  return emailOk && passwordOk;
+function hideError() {
+  els.error.hidden = true;
 }
 
-// Clear a field's error as soon as the user starts fixing it
-[emailInput, passwordInput].forEach((input) => {
-  input.addEventListener("input", () => {
-    setFieldError(input, false);
-    loginError.hidden = true;
-  });
-});
-
-/* ---------- Sign in ---------- */
-// Replace the body of this function with Supabase Auth later, e.g.
-// supabase.auth.signInWithPassword({ email, password })
-async function signIn(email, password) {
-  await new Promise((resolve) => setTimeout(resolve, 600)); // pretend network delay
-
-  if (password.length < MIN_PASSWORD_LENGTH) {
-    return { ok: false, message: "Wrong email or password. Please try again." };
+/* ---------- Messages passed in the address (?signedout=1, ?expired=1) ---------- */
+function showNoticeFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  let message = "";
+  if (params.has("signedout")) message = "You're signed out.";
+  if (params.has("expired")) message = "Your session ended. Please sign in again.";
+  if (message) {
+    els.noticeText.textContent = message;
+    els.notice.hidden = false;
   }
-  return { ok: true };
+  if (params.toString()) history.replaceState(null, "", "login.html"); // a refresh won't show it again
 }
 
-function setLoading(isLoading) {
-  loginButton.disabled = isLoading;
-  loginButton.textContent = isLoading ? "Signing in…" : "Sign in";
-}
+/* ---------- Google calls this after the person picks an account ---------- */
+function onGoogleCredential(response) {
+  hideError();
 
-form.addEventListener("submit", async (event) => {
-  event.preventDefault();
-  loginError.hidden = true;
-
-  if (!validateForm()) return;
-
-  setLoading(true);
+  let profile;
   try {
-    const result = await signIn(emailInput.value.trim(), passwordInput.value);
-
-    if (!result.ok) {
-      loginErrorText.textContent = result.message;
-      loginError.hidden = false;
-      passwordInput.value = "";
-      passwordInput.focus();
-      return;
-    }
-
-    // Demo only: remember that someone "signed in" so later pages can check it
-    try { sessionStorage.setItem("ecaAdminDemo", emailInput.value.trim()); } catch (err) { /* storage blocked */ }
-    window.location.href = "dashboard.html";
+    profile = decodeGoogleCredential(response.credential);
   } catch (err) {
-    loginErrorText.textContent = "Couldn't sign in. Please check your internet connection and try again.";
-    loginError.hidden = false;
-  } finally {
-    setLoading(false);
+    showError("Google sign-in didn't work. Please try again.");
+    return;
   }
-});
 
-/* ---------- Forgot password ---------- */
-document.getElementById("forgotLink").addEventListener("click", (event) => {
-  event.preventDefault();
-  loginErrorText.textContent = "Password reset is not available yet. Please contact the website administrator.";
-  loginError.hidden = false;
-});
+  const problem = checkGoogleProfile(profile);
+  if (problem) {
+    showError(problem);
+    return;
+  }
+
+  if (!isAllowedAdmin(profile.email, profile.hd)) {
+    // Don't remember this account, so the next click lets them choose another one
+    google.accounts.id.disableAutoSelect();
+    showError(`${profile.email} isn't on the ECA staff list. Sign in with your school-approved Google account, or ask the website administrator to add this one.`);
+    return;
+  }
+
+  try {
+    saveAdminSession(profile, response.credential);
+  } catch (err) {
+    showError("Your browser blocked sign-in. Turn off private browsing or allow this site to save data, then try again.");
+    return;
+  }
+  window.location.replace("dashboard.html");
+}
+
+/* ---------- Draw the Google button ---------- */
+function startGoogle() {
+  if (googleStarted) return;
+  googleStarted = true;
+
+  google.accounts.id.initialize({
+    client_id: GOOGLE_CLIENT_ID,
+    callback: onGoogleCredential,
+    ux_mode: "popup",      // sign in in a small Google window; this page stays open
+    auto_select: false,    // always let the person choose the account
+    context: "signin"
+  });
+
+  // Google needs a width in pixels (200-400)
+  const width = Math.max(200, Math.min(400, Math.round(els.signin.clientWidth || 400)));
+  google.accounts.id.renderButton(els.button, {
+    type: "standard",
+    theme: "outline",
+    size: "large",
+    text: "signin_with",
+    shape: "pill",
+    logo_alignment: "center",
+    width
+  });
+  els.loading.hidden = true;
+}
+
+/* ---------- Start ---------- */
+function init() {
+  // Already signed in (for example, pressed Back): go straight to the dashboard
+  if (readAdminSession()) {
+    window.location.replace("dashboard.html");
+    return;
+  }
+
+  showNoticeFromUrl();
+
+  if (!isGoogleConfigured()) {
+    els.signin.hidden = true;
+    els.setup.hidden = false;
+    return;
+  }
+
+  // Google's script (loaded with async at the bottom of login.html) calls this when ready.
+  // If it already loaded before this file ran, start right away.
+  window.onGoogleLibraryLoad = startGoogle;
+  if (window.google && google.accounts && google.accounts.id) startGoogle();
+
+  setTimeout(() => {
+    if (googleStarted) return;
+    els.loading.hidden = true;
+    showError("Google sign-in couldn't load. Check your internet connection, turn off any ad or script blocker for this site, then refresh the page.");
+  }, GOOGLE_LOAD_TIMEOUT);
+}
+
+init();
