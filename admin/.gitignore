@@ -1,0 +1,11 @@
+# Editor settings (personal to each computer)
+.vscode/
+
+# Windows and macOS system files
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Environment files (for Supabase keys later; never upload these)
+.env
+.env.*

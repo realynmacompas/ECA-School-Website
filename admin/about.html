@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About ECA | Elim Christian Academy, Inc.</title>
+  <meta name="description" content="Learn about Elim Christian Academy, a Christ-centered school in Trece Martires City, Cavite, serving families from Early Childhood to Senior High since 1993.">
+  <meta name="theme-color" content="#3d2616">
+  <link rel="icon" type="image/png" href="assets/images/favicon.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Montserrat:wght@600;700;800&family=Source+Sans+3:wght@400;600;700&family=Lora:ital@1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <script>
+    try {
+      var ecaText = localStorage.getItem("ecaTextSize");
+      if (ecaText) document.documentElement.setAttribute("data-text", ecaText);
+      if (localStorage.getItem("ecaContrast") === "high") document.documentElement.classList.add("high-contrast");
+    } catch (e) {}
+  </script>
+</head>
+<body>
+  <!-- Reusable icons. Use with: <svg><use href="#i-name"></use></svg> -->
+  <svg class="sprite" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+    <symbol id="i-phone" viewBox="0 0 24 24"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z"/></symbol>
+    <symbol id="i-mail" viewBox="0 0 24 24"><path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 4-8 5-8-5V6l8 5 8-5z"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 5.3 7 13 7 13s7-7.7 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></symbol>
+    <symbol id="i-fb" viewBox="0 0 24 24"><path d="M14 8h3V4h-3a4 4 0 0 0-4 4v2H8v4h2v8h4v-8h3l1-4h-4V8z"/></symbol>
+    <symbol id="i-messenger" viewBox="0 0 24 24"><path d="M12 2C6.4 2 2 6.1 2 11.5c0 2.9 1.3 5.4 3.4 7.1V22l3.1-1.7c1.1.3 2.3.5 3.5.5 5.6 0 10-4.1 10-9.4S17.6 2 12 2zm1 12.6-2.6-2.7-5 2.7 5.5-5.8 2.6 2.7 4.9-2.7z"/></symbol>
+    <symbol id="i-ig" viewBox="0 0 24 24"><path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3zm5 3.5a4.5 4.5 0 1 1 0 9 4.5 4.5 0 0 1 0-9zm0 2a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM17.5 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/></symbol>
+    <symbol id="i-left" viewBox="0 0 24 24"><path d="M15.4 7.4 14 6l-6 6 6 6 1.4-1.4L10.8 12z"/></symbol>
+    <symbol id="i-right" viewBox="0 0 24 24"><path d="M8.6 16.6 10 18l6-6-6-6-1.4 1.4 4.6 4.6z"/></symbol>
+    <symbol id="i-up" viewBox="0 0 24 24"><path d="M7.4 15.4 6 14l6-6 6 6-1.4 1.4-4.6-4.6z"/></symbol>
+    <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 4h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H8l-4 4V6a2 2 0 0 1 2-2z"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="M19 6.4 17.6 5 12 10.6 6.4 5 5 6.4 10.6 12 5 17.6 6.4 19 12 13.4 17.6 19 19 17.6 13.4 12z"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24"><path d="M2 21 23 12 2 3v7l15 2-15 2z"/></symbol>
+    <symbol id="i-megaphone" viewBox="0 0 24 24"><path d="M3 10v4a1 1 0 0 0 1 1h2l4 5h2l-2-5h2l7 4V5l-7 4H4a1 1 0 0 0-1 1zm18 0v4a2 2 0 0 0 0-4z"/></symbol>
+    <symbol id="i-cap" viewBox="0 0 24 24"><path d="M12 3 1 9l11 6 9-4.9V17h2V9zM5 13.2V17l7 4 7-4v-3.8L12 17z"/></symbol>
+    <symbol id="i-book" viewBox="0 0 24 24"><path d="M18 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2zm-5 4h2v3h3v2h-3v6h-2v-6h-3V9h3z"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 11a3 3 0 1 0-3-3 3 3 0 0 0 3 3zm-8 0a3 3 0 1 0-3-3 3 3 0 0 0 3 3zm0 2c-2.3 0-7 1.2-7 3.5V19h14v-2.5C15 14.2 10.3 13 8 13zm8 0h-1a4.8 4.8 0 0 1 2 3.5V19h6v-2.5c0-2.3-4.7-3.5-7-3.5z"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 1 3 5v6c0 5.6 3.8 10.7 9 12 5.2-1.3 9-6.4 9-12V5zm-2 16-4-4 1.4-1.4 2.6 2.6 6.6-6.6L18 9z"/></symbol>
+    <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M19 5h-2V3H7v2H5a2 2 0 0 0-2 2v1a4 4 0 0 0 3.6 4A5 5 0 0 0 11 15.9V19H7v2h10v-2h-4v-3.1a5 5 0 0 0 4.4-3.9A4 4 0 0 0 21 8V7a2 2 0 0 0-2-2zM5 8V7h2v3a2 2 0 0 1-2-2zm14 0a2 2 0 0 1-2 2V7h2z"/></symbol>
+    <symbol id="i-camera" viewBox="0 0 24 24"><path d="M9 3 7.2 5H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-3.2L15 3zm3 15a5 5 0 1 1 5-5 5 5 0 0 1-5 5zm0-2a3 3 0 1 0-3-3 3 3 0 0 0 3 3z"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 16H5V9h14zM7 11h5v5H7z"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><path d="M18 8h-1V6a5 5 0 0 0-10 0v2H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V10a2 2 0 0 0-2-2zm-6 9a2 2 0 1 1 2-2 2 2 0 0 1-2 2zm3.1-9H8.9V6a3.1 3.1 0 0 1 6.2 0z"/></symbol>
+    <symbol id="i-contrast" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 18V4a8 8 0 0 1 0 16z"/></symbol>
+    <symbol id="i-directory" viewBox="0 0 24 24"><path d="M19 2H6a2 2 0 0 0-2 2v2H2v2h2v3H2v2h2v3H2v2h2v2a2 2 0 0 0 2 2h13a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2zm-6.5 4a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5zM17 17H8v-1c0-1.7 3-2.5 4.5-2.5S17 14.3 17 16z"/></symbol>
+    <symbol id="i-doc" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zm2 16H8v-2h8zm0-4H8v-2h8zm-3-5V3.5L18.5 9z"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></symbol>
+  </svg>
+
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <!-- ============ ANNOUNCEMENT TICKER ============ -->
+  <div class="ticker" aria-label="Announcements" hidden>
+    <span class="ticker__label">
+      <svg aria-hidden="true"><use href="#i-megaphone"></use></svg>
+      Announcements
+    </span>
+    <div class="ticker__viewport">
+      <!-- The list is duplicated by main.js so the scroll loops without a gap -->
+      <ul class="ticker__track" id="tickerTrack">
+        <!-- Rendered by js/main.js from the data store (edit in Admin > Announcements) -->
+      </ul>
+    </div>
+  </div>
+
+  <!-- ============ TOP BAR ============ -->
+  <div class="topbar">
+    <div class="container topbar__inner">
+      <div class="a11y" role="group" aria-label="Accessibility options">
+        <span class="a11y__label">Text size</span>
+        <button type="button" class="a11y__btn" data-text-size="sm" aria-label="Smaller text">A&minus;</button>
+        <button type="button" class="a11y__btn" data-text-size="md" aria-label="Default text size">A</button>
+        <button type="button" class="a11y__btn" data-text-size="lg" aria-label="Larger text">A+</button>
+        <button type="button" class="a11y__btn a11y__btn--contrast" id="contrastToggle" aria-pressed="false">
+          <svg aria-hidden="true"><use href="#i-contrast"></use></svg><span>High contrast</span>
+        </button>
+      </div>
+      <ul class="topbar__contacts">
+        <li><a href="tel:+639399098717"><svg aria-hidden="true"><use href="#i-phone"></use></svg>0939 909 8717</a></li>
+        <li class="topbar__email"><a href="mailto:elim.educ@gmail.com"><svg aria-hidden="true"><use href="#i-mail"></use></svg>elim.educ@gmail.com</a></li>
+        <li class="topbar__social">
+          <a href="https://www.facebook.com/ElimChristianAcademy" target="_blank" rel="noopener" aria-label="Facebook"><svg aria-hidden="true"><use href="#i-fb"></use></svg></a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ============ HEADER / NAV ============ -->
+  <header class="site-header" id="siteHeader">
+    <div class="container site-header__inner">
+      <a href="index.html" class="brand" aria-label="Elim Christian Academy home">
+        <img src="assets/images/logo.png" alt="" class="brand__logo" width="60" height="60">
+        <span class="brand__text">
+          <strong>Elim Christian Academy</strong>
+          <small>Trece Martires City &middot; Est. 1993</small>
+        </span>
+      </a>
+
+      <button class="nav-toggle" aria-expanded="false" aria-controls="primary-nav">
+        <span class="sr-only">Open menu</span>
+        <span class="nav-toggle__bar"></span>
+      </button>
+
+      <nav class="primary-nav" id="primary-nav" aria-label="Main">
+        <ul>
+          <li><a href="about.html" aria-current="page">About</a></li>
+          <li><a href="index.html#programs">Academics</a></li>
+          <li><a href="index.html#apply">Admissions</a></li>
+          <li><a href="index.html#news">News &amp; Events</a></li>
+          <li><a href="index.html#calendar">Calendar</a></li>
+          <li><a href="index.html#contact">Contact</a></li>
+        </ul>
+        <a href="index.html#apply" class="btn btn--accent btn--sm btn--pulse">Enroll Now</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" class="about-page">
+    <!-- ============ PAGE HEADER ============ -->
+    <section class="page-hero page-hero--split">
+      <div class="page-hero__grid">
+        <div class="page-hero__text">
+          <nav class="page-hero__crumbs" aria-label="Breadcrumb">
+            <a href="index.html">Home</a> <span aria-hidden="true">&rsaquo;</span> <span aria-current="page">About ECA</span>
+          </nav>
+          <h1 class="page-hero__title">About <span>Elim Christian</span> Academy</h1>
+          <p class="page-hero__lead">A Christ-centered school in Barangay De Ocampo, Trece Martires City, serving families from Early Childhood to Senior High since 1993.</p>
+          <p class="page-hero__tagline">&ldquo;Enriching Lives, Inspiring Minds.&rdquo;</p>
+        </div>
+        <div class="page-hero__media">
+          <img src="assets/images/hero-campus.jpg" alt="Students during the Monday flag ceremony" width="1440" height="810">
+          <div class="since-badge" aria-hidden="true">
+            <span>Since</span>
+            <strong>1993</strong>
+            <small>33 years</small>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ ON THIS PAGE ============ -->
+    <nav class="page-nav" aria-label="On this page">
+      <div class="container page-nav__inner">
+        <span class="page-nav__label">On this page:</span>
+        <a href="#story">Our Story</a>
+        <a href="#mission">Mission &amp; Vision</a>
+        <a href="#leaders">Our Leaders</a>
+        <a href="#recognition">Recognition</a>
+        <a href="#visit">Visit Us</a>
+      </div>
+    </nav>
+
+    <!-- ============ AT A GLANCE ============ -->
+    <section class="glance" aria-label="ECA at a glance">
+      <div class="container glance__grid">
+        <div class="glance__item reveal">
+          <strong>1993</strong>
+          <span>Year founded</span>
+          <small>33rd founding anniversary in 2026</small>
+        </div>
+        <div class="glance__item reveal">
+          <strong>4</strong>
+          <span>Program levels</span>
+          <small>Early Childhood to Senior High</small>
+        </div>
+        <div class="glance__item reveal">
+          <strong>K to 12</strong>
+          <span>DepEd curriculum</span>
+          <small>With Bible and values education</small>
+        </div>
+        <div class="glance__item reveal">
+          <strong>ESC</strong>
+          <span>Participating school</span>
+          <small>Education Service Contracting</small>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ OUR STORY ============ -->
+    <section class="section story" id="story">
+      <div class="container story__grid">
+        <div class="story__text reveal">
+          <p class="kicker">Our story</p>
+          <h2 class="section-title">Three decades of <span>Christian education</span></h2>
+          <p>Elim Christian Academy opened its doors in 1993 to give families in Trece Martires a school where learning and faith grow together. Today it serves learners from Early Childhood Education through Senior High School.</p>
+          <!-- TODO: replace with the school's history (founders, how ECA grew) -->
+          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+
+          <!-- TODO: replace the middle milestones with real years and events -->
+          <ol class="timeline">
+            <li class="timeline__item timeline__item--key">
+              <strong>1993</strong>
+              <span>Elim Christian Academy is founded</span>
+            </li>
+            <li class="timeline__item">
+              <strong>2005</strong>
+              <span>Lorem ipsum dolor sit amet, consectetur adipiscing</span>
+            </li>
+            <li class="timeline__item">
+              <strong>2016</strong>
+              <span>Lorem ipsum dolor sit amet, sed do eiusmod tempor</span>
+            </li>
+            <li class="timeline__item timeline__item--key">
+              <strong>2026</strong>
+              <span>33rd Founding Anniversary</span>
+            </li>
+          </ol>
+        </div>
+
+        <div class="story__media reveal">
+          <img class="story__photo story__photo--main" src="assets/images/about-2.jpg" alt="ECA students in uniform" width="600" height="600" loading="lazy">
+          <img class="story__photo story__photo--small" src="assets/images/apply-banner.jpg" alt="Students gathered for a school assembly" width="1440" height="630" loading="lazy">
+          <blockquote class="story__quote">
+            <p>&ldquo;Train up a child in the way he should go.&rdquo;</p>
+            <cite>Proverbs 22:6</cite>
+          </blockquote>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ MISSION, VISION, VALUES ============ -->
+    <section class="section values" id="mission">
+      <div class="container">
+        <div class="section-head section-head--center reveal">
+          <div>
+            <p class="kicker kicker--light">What guides us</p>
+            <h2 class="section-title section-title--light">Mission &amp; <span>Vision</span></h2>
+          </div>
+        </div>
+
+        <div class="mv__grid">
+          <article class="mv__card reveal">
+            <h3><svg aria-hidden="true"><use href="#i-check"></use></svg>Our Mission</h3>
+            <!-- TODO: replace with the official mission statement, word for word -->
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio praesent libero, sed cursus ante dapibus diam. Sed nisi nulla quis sem at nibh elementum imperdiet, duis sagittis ipsum.</p>
+          </article>
+          <article class="mv__card reveal">
+            <h3><svg aria-hidden="true"><use href="#i-check"></use></svg>Our Vision</h3>
+            <!-- TODO: replace with the official vision statement, word for word -->
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent mauris fusce nec tellus sed augue semper porta. Mauris massa vestibulum lacinia arcu eget nulla.</p>
+          </article>
+        </div>
+
+        <h3 class="values__title">Core values</h3>
+        <div class="values__grid">
+          <div class="value reveal">
+            <svg aria-hidden="true"><use href="#i-book"></use></svg>
+            <strong>Christ-Centered Learning</strong>
+            <span>Bible and values education are part of every school day.</span>
+          </div>
+          <div class="value reveal">
+            <svg aria-hidden="true"><use href="#i-users"></use></svg>
+            <strong>Dedicated Teachers</strong>
+            <span>Teachers who guide students in and out of the classroom.</span>
+          </div>
+          <div class="value reveal">
+            <svg aria-hidden="true"><use href="#i-shield"></use></svg>
+            <strong>Safe Campus</strong>
+            <span>An orderly, respectful place where students can focus on learning.</span>
+          </div>
+          <div class="value reveal">
+            <svg aria-hidden="true"><use href="#i-trophy"></use></svg>
+            <strong>Well-Rounded Growth</strong>
+            <span>Sports, arts, and school events that build confidence.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ LEADERSHIP ============ -->
+    <section class="section leader" id="leaders">
+      <div class="container leader__grid">
+        <!-- TODO: replace with a portrait photo of the School Director:
+             <img class="leader__photo reveal" src="assets/images/director.jpg" alt="[Name], School Director"> -->
+        <div class="leader__photo leader__photo--empty reveal" role="img" aria-label="Photo of the School Director coming soon">
+          <svg aria-hidden="true"><use href="#i-users"></use></svg>
+          <span>Photo coming soon</span>
+        </div>
+
+        <div class="leader__text reveal">
+          <p class="kicker">Our leaders</p>
+          <h2 class="section-title">A message from our <span>School Director</span></h2>
+          <!-- TODO: replace with the director's real welcome message, name and position -->
+          <blockquote class="leader__message">
+            <p>&ldquo;Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore.&rdquo;</p>
+          </blockquote>
+          <p class="leader__name">
+            <strong>Lorem Ipsum Dolor</strong>
+            <span>School Director, Elim Christian Academy, Inc.</span>
+          </p>
+          <a href="faculty.html" class="btn btn--dark">Meet our Faculty &amp; Staff</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ RECOGNITION ============ -->
+    <section class="section recognition" id="recognition">
+      <div class="container">
+        <div class="section-head reveal">
+          <div>
+            <p class="kicker">Recognition</p>
+            <h2 class="section-title">Recognized and <span>accredited</span></h2>
+          </div>
+          <p class="recognition__note">Government recognition and program participation, as shown on the school's official materials.</p>
+        </div>
+
+        <div class="recognition__grid">
+          <div class="badge-card reveal">
+            <span class="badge-card__icon"><svg aria-hidden="true"><use href="#i-shield"></use></svg></span>
+            <strong>DepEd Recognized</strong>
+            <!-- TODO: replace with the real government recognition number -->
+            <span>Government Recognition No. Lorem-0000</span>
+          </div>
+          <div class="badge-card reveal">
+            <span class="badge-card__icon"><svg aria-hidden="true"><use href="#i-pin"></use></svg></span>
+            <strong>SDO Cavite Province</strong>
+            <span>Schools Division Office</span>
+          </div>
+          <div class="badge-card reveal">
+            <span class="badge-card__icon"><svg aria-hidden="true"><use href="#i-check"></use></svg></span>
+            <strong>ESC Participating School</strong>
+            <span>Education Service Contracting for Junior High</span>
+          </div>
+          <div class="badge-card reveal">
+            <span class="badge-card__icon"><svg aria-hidden="true"><use href="#i-cap"></use></svg></span>
+            <strong>PEAC</strong>
+            <span>Private Education Assistance Committee</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ VISIT US ============ -->
+    <section class="section visit" id="visit">
+      <div class="container visit__grid">
+        <div class="visit__text reveal">
+          <p class="kicker">Visit us</p>
+          <h2 class="section-title">Come see our <span>campus</span></h2>
+          <p>Parents are welcome to visit during office hours to ask about enrollment, tour the school and meet our staff.</p>
+          <dl class="visit__details">
+            <div><dt>Address</dt><dd>Barangay De Ocampo, Trece Martires City, Cavite</dd></div>
+            <div><dt>Office hours</dt><dd>Monday to Friday, 8:00 AM &ndash; 5:00 PM</dd></div>
+            <div><dt>Phone</dt><dd><a href="tel:+639399098717">0939 909 8717</a> &middot; <a href="tel:+63464191668">(046) 419 1668</a></dd></div>
+            <div><dt>Email</dt><dd><a href="mailto:elim.educ@gmail.com">elim.educ@gmail.com</a></dd></div>
+          </dl>
+          <div class="visit__actions">
+            <a href="index.html#apply" class="btn btn--accent btn--lg">Start my application</a>
+            <a href="index.html#contact" class="btn btn--outline-dark btn--lg">Get directions</a>
+          </div>
+        </div>
+        <figure class="visit__photo reveal">
+          <img src="assets/images/gallery/faculty.jpg" alt="ECA faculty and staff" width="1000" height="500" loading="lazy">
+          <figcaption><strong>Our faculty &amp; staff</strong><span>The people who welcome you at ECA</span></figcaption>
+        </figure>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="site-footer">
+    <div class="container site-footer__grid">
+      <div class="footer-col footer-col--wide">
+        <a href="index.html" class="brand brand--footer">
+          <img src="assets/images/logo.png" alt="" class="brand__logo brand__logo--lg" width="72" height="72" loading="lazy">
+          <span class="brand__text">
+            <strong>Elim Christian Academy, Inc.</strong>
+            <small>Enriching Lives, Inspiring Minds.</small>
+          </span>
+        </a>
+        <address>
+          <p class="footer-item"><svg aria-hidden="true"><use href="#i-pin"></use></svg>Barangay De Ocampo, Trece Martires City, Cavite, Philippines</p>
+          <p class="footer-item"><svg aria-hidden="true"><use href="#i-phone"></use></svg><span><a href="tel:+639399098717">0939 909 8717</a> &middot; <a href="tel:+63464191668">(046) 419 1668</a></span></p>
+          <p class="footer-item"><svg aria-hidden="true"><use href="#i-mail"></use></svg><a href="mailto:elim.educ@gmail.com">elim.educ@gmail.com</a></p>
+          <p class="footer-item"><svg aria-hidden="true"><use href="#i-calendar"></use></svg>Office hours: Mon&ndash;Fri, 8:00 AM &ndash; 5:00 PM</p>
+        </address>
+        <div class="socials">
+          <a href="https://www.facebook.com/ElimChristianAcademy" target="_blank" rel="noopener" aria-label="Facebook"><svg aria-hidden="true"><use href="#i-fb"></use></svg></a>
+          <a href="https://m.me/ElimChristianAcademy" target="_blank" rel="noopener" aria-label="Messenger"><svg aria-hidden="true"><use href="#i-messenger"></use></svg></a>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <h2 class="footer-title">Quick Links</h2>
+        <ul class="footer-links">
+          <li><a href="about.html">About ECA</a></li>
+          <li><a href="index.html#apply">Admissions</a></li>
+          <li><a href="index.html#calendar">School Calendar</a></li>
+          <li><a href="faculty.html">Faculty &amp; Staff Directory</a></li>
+          <li><a href="portal.html">Parent &amp; Student Portal</a></li>
+          <li><a href="index.html#news">News &amp; Events</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h2 class="footer-title">School Policies</h2>
+        <ul class="footer-links">
+          <li><a href="policies.html#privacy">Data Privacy Notice</a></li>
+          <li><a href="policies.html#child-protection">Child Protection Policy</a></li>
+          <li><a href="policies.html#anti-bullying">Anti-Bullying Policy</a></li>
+          <li><a href="policies.html#handbook">Student Handbook</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h2 class="footer-title">Featured Links</h2>
+        <ul class="footer-links">
+          <li><a href="https://www.deped.gov.ph/" target="_blank" rel="noopener">Department of Education</a></li>
+          <li><a href="https://lis.deped.gov.ph/" target="_blank" rel="noopener">DepEd Learner Information System</a></li>
+          <li><a href="https://www.facebook.com/ElimChristianAcademy" target="_blank" rel="noopener">ECA Official Facebook Page</a></li>
+        </ul>
+        <!-- Recognitions shown on the school's enrollment poster. Replace with official badge images if the school provides them. -->
+        <ul class="badges">
+          <li>DepEd Recognized</li>
+          <li>ESC Participating School</li>
+          <li>PEAC</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="site-footer__bottom">
+      <div class="container">
+        <p>Copyright &copy; <span id="year">2026</span> Elim Christian Academy, Inc. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ============ BACK TO TOP ============ -->
+  <a href="#main" class="to-top" id="toTop" aria-label="Back to top"><svg aria-hidden="true"><use href="#i-up"></use></svg></a>
+
+  <!-- ============ HELP DESK CHAT ============ -->
+  <div class="chat" id="chat">
+    <div class="chat__teaser" id="chatTeaser" hidden>
+      <button type="button" class="chat__teaser-close" id="chatTeaserClose" aria-label="Hide message"><svg aria-hidden="true"><use href="#i-close"></use></svg></button>
+      <p><strong>Hi! Questions about enrollment?</strong><br>Tap here for quick answers.</p>
+    </div>
+
+    <button type="button" class="chat__launcher" id="chatLauncher" aria-expanded="false" aria-controls="chatPanel" aria-label="Questions? Open the help desk">
+      <svg class="chat-icon icon-open" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/><path d="M10 8.6a2 2 0 1 1 2.6 1.9c-.4.2-.6.5-.6.9v.4"/><path d="M12 13.6h.01"/></svg>
+      <svg class="icon-close" aria-hidden="true"><use href="#i-close"></use></svg>
+      <span class="chat__launcher-label" id="chatLauncherLabel">Questions?</span>
+    </button>
+
+    <section class="chat__panel" id="chatPanel" aria-label="ECA Help Desk" hidden>
+      <header class="chat__header">
+        <span class="chat__logo-wrap"><img src="assets/images/logo.png" alt="" class="chat__logo" width="38" height="38" loading="lazy"></span>
+        <div class="chat__title">
+          <h2>ECA Help Desk</h2>
+          <p>Quick answers to common questions</p>
+        </div>
+        <button type="button" class="chat__close" id="chatClose" aria-label="Close help desk"><svg aria-hidden="true"><use href="#i-close"></use></svg></button>
+      </header>
+
+      <div class="chat__body" id="chatBody" aria-live="polite"></div>
+
+      <form class="chat__form" id="chatForm" autocomplete="off">
+        <div class="chat__form-row">
+          <label for="chatInput" class="sr-only">Type your question</label>
+          <input id="chatInput" type="text" maxlength="200" placeholder="Type your question…">
+          <button type="submit" aria-label="Send"><svg class="chat-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+        </div>
+        <p class="chat__note">Automated answers. For anything else, please contact the office.</p>
+      </form>
+    </section>
+  </div>
+
+  <script src="admin/js/store.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/chatbot.js"></script>
+</body>
+</html>

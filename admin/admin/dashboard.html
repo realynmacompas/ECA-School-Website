@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Dashboard | ECA Website Admin</title>
+  <link rel="icon" type="image/png" href="../assets/images/favicon.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body data-page="dashboard">
+  <div class="admin">
+    <!-- Filled in by js/layout.js -->
+    <aside class="sidebar" id="sidebar"></aside>
+    <header class="mobilebar" id="mobileBar"></header>
+
+    <main class="main" id="main">
+      <div class="page-head">
+        <div>
+          <p class="page-head__date" id="todayDate"></p>
+          <h1 class="page-title">Welcome back! What would you like to do today?</h1>
+        </div>
+      </div>
+
+      <!-- Shown if the data can't be loaded -->
+      <div class="alert alert--error" id="loadError" role="alert" hidden>
+        <span>Couldn't load the latest content. Please refresh the page.</span>
+      </div>
+
+      <!-- ===== Task tiles (numbers filled in by js/dashboard.js) ===== -->
+      <section class="tiles" aria-label="Quick tasks">
+        <article class="tile tile--news">
+          <div class="tile__top">
+            <span class="tile__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h13v16H6a2 2 0 0 1-2-2z"/><path d="M17 8h3v10a2 2 0 0 1-2 2"/><path d="M8 8h5M8 12h5M8 16h3"/></svg>
+            </span>
+            <span class="tile__count" id="newsCount">–</span>
+          </div>
+          <h2 class="tile__title">News</h2>
+          <p class="tile__note" id="newsNote">&nbsp;</p>
+          <a href="news-form.html" class="btn btn--primary btn--block">+ Post News</a>
+          <a href="news.html" class="tile__link">Manage all news</a>
+        </article>
+
+        <article class="tile tile--events">
+          <div class="tile__top">
+            <span class="tile__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+            </span>
+            <span class="tile__count" id="eventsCount">–</span>
+          </div>
+          <h2 class="tile__title">Events</h2>
+          <p class="tile__note" id="eventsNote">&nbsp;</p>
+          <a href="events.html" class="btn btn--dark btn--block">+ Add Event</a>
+          <a href="events.html" class="tile__link">Manage all events</a>
+        </article>
+
+        <article class="tile tile--photos">
+          <div class="tile__top">
+            <span class="tile__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-9 9"/></svg>
+            </span>
+                        <span class="tile__count" id="albumsCount">–</span>
+          </div>
+          <h2 class="tile__title">Albums</h2>
+          <p class="tile__note" id="albumsNote">&nbsp;</p>
+          <a href="album-form.html" class="btn btn--gold btn--block">+ New Album</a>
+          <a href="albums.html" class="tile__link">Manage albums</a>
+        </article>
+
+        <article class="tile tile--announcements">
+          <div class="tile__top">
+            <span class="tile__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11v2h3l6 5V6L6 11z"/><path d="M16 9a4 4 0 0 1 0 6"/></svg>
+            </span>
+            <span class="tile__status" id="announcementStatus">–</span>
+          </div>
+          <h2 class="tile__title">Announcements</h2>
+          <p class="tile__note" id="announcementNote">&nbsp;</p>
+          <a href="announcements.html" class="btn btn--green btn--block">Edit messages</a>
+          <span class="tile__link tile__link--plain">Top bar of the website</span>
+        </article>
+      </section>
+
+      <!-- ===== Recent news + coming up ===== -->
+      <div class="dash-grid">
+        <section class="card">
+          <div class="card__head">
+            <h2 class="card__title">Recent news</h2>
+            <a href="news.html" class="card__more">See all news &rarr;</a>
+          </div>
+          <ul class="item-list" id="recentNews">
+            <li class="item-list__empty">Loading…</li>
+          </ul>
+        </section>
+
+        <div class="dash-side">
+          <section class="card">
+            <div class="card__head">
+              <h2 class="card__title">Coming up</h2>
+              <a href="events.html" class="card__more">All events &rarr;</a>
+            </div>
+            <ul class="item-list" id="upcomingEvents">
+              <li class="item-list__empty">Loading…</li>
+            </ul>
+          </section>
+
+          <section class="card card--help">
+            <h2 class="card__title">Need help?</h2>
+            <p>Step-by-step guide with pictures: how to post news, add events, and upload photos.</p>
+            <a href="#" class="card__more">Open the Admin Guide &rarr;</a>
+            <!-- DEMO MODE: remove once Supabase is connected -->
+            <button type="button" class="link-button" id="resetDemo">Reset demo data</button>
+          </section>
+        </div>
+      </div>
+    </main>
+
+    <nav class="tabbar" id="tabbar" aria-label="Admin sections"></nav>
+  </div>
+
+  <!-- Order matters: helpers → data → sign-in → layout → this page -->
+  <script src="js/utils.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/auth-config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>
