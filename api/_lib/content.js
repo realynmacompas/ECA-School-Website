@@ -178,7 +178,8 @@ function newsFromRow(row) {
   return {
     id: row.id, title: row.title, category: row.category, date: row.date,
     summary: row.summary, body: row.body || "", author: row.author, image: row.image,
-    isPoster: Boolean(row.is_poster), facebookUrl: row.facebook_url, status: row.status
+    isPoster: Boolean(row.is_poster), facebookUrl: row.facebook_url, status: row.status,
+    facebookPosted: Boolean(row.facebook_post_id)   // posted from the admin ("Also post to Facebook")
   };
 }
 
@@ -234,13 +235,13 @@ export async function saveNews(input, email, id = null) {
         `UPDATE news SET title = ?, category = ?, date = ?, summary = ?, body = ?, author = ?, image = ?,
          is_poster = ?, facebook_url = ?, status = ?, updated_by = ? WHERE id = ?`, [...values, existing.id]);
       if (existing.image !== item.image) await deleteUnusedImages(conn, [existing.image]);
-      return { ...item, id: existing.id };
+      return { ...item, id: existing.id, facebookPosted: existing.facebookPosted };
     }
     const newIdValue = newId("n");
     await conn.execute(
       `INSERT INTO news (title, category, date, summary, body, author, image, is_poster, facebook_url, status,
        updated_by, created_by, id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, [...values, email, newIdValue]);
-    return { ...item, id: newIdValue };
+    return { ...item, id: newIdValue, facebookPosted: false };
   });
 }
 
@@ -310,7 +311,8 @@ export async function deleteEvent(id) {
 function albumFromRow(row, photos) {
   return {
     id: row.id, title: row.title, caption: row.caption, category: row.category, date: row.date,
-    photos, featured: Boolean(row.featured), status: row.status
+    photos, featured: Boolean(row.featured), status: row.status,
+    facebookUrl: row.facebook_url || "", facebookPosted: Boolean(row.facebook_post_id)
   };
 }
 
@@ -389,7 +391,8 @@ export async function saveAlbum(input, email, id = null) {
       await conn.execute("INSERT INTO album_photos (album_id, position, src) VALUES (?, ?, ?)", [albumId, position, src]);
     }
     if (existing) await deleteUnusedImages(conn, existing.photos.filter((src) => !photos.includes(src)));
-    return { ...item, photos, id: albumId };
+    return { ...item, photos, id: albumId,
+      facebookUrl: existing ? existing.facebookUrl : "", facebookPosted: existing ? existing.facebookPosted : false };
   });
 }
 

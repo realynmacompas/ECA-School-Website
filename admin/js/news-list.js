@@ -30,6 +30,7 @@ function showSavedMessageFromUrl() {
   const saved = params.get("saved");
   if (messages[saved]) showToast(messages[saved], saved === "draft" ? "info" : "success");
   // Remove ?saved=… so refreshing the page doesn't show the message again
+  showFacebookResultFromUrl(params);
   if (saved) history.replaceState(null, "", "news.html");
 }
 

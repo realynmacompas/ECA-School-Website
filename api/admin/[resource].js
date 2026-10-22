@@ -14,6 +14,7 @@ import { allowMethods, handler, readJsonBody, sendJson, HttpError } from "../_li
 import { requireAdmin } from "../_lib/auth.js";
 import * as content from "../_lib/content.js";
 import { copyToDriveQuietly } from "../_lib/drive.js";
+import { shareQuietly } from "../_lib/facebook.js";
 
 const RESOURCES = {
   news: { list: content.listNews, get: content.getNews, save: content.saveNews, remove: content.deleteNews, name: "news post" },
@@ -45,11 +46,25 @@ export default handler(async (req, res) => {
     return sendJson(res, 200, item);
   }
   if (req.method === "POST" || req.method === "PUT") {
-    const saved = await r.save(await readJsonBody(req), admin.email, req.method === "PUT" ? id : null);
+    const body = await readJsonBody(req);
+    const saved = await r.save(body, admin.email, req.method === "PUT" ? id : null);
+    const extra = {};
     // New photos: put an organized copy in Google Drive (if connected). Never blocks the save.
     const photos = resource === "news" ? [saved.image] : resource === "albums" ? saved.photos : [];
     const drive = await copyToDriveQuietly(photos);
-    return sendJson(res, req.method === "POST" ? 201 : 200, drive ? { ...saved, drive } : saved);
+    if (drive) extra.drive = drive;
+    // "Also post to the school's Facebook page" ticked and published: post once. Never blocks the save.
+    if (body.shareToFacebook === true && saved.status === "published" && (resource === "news" || resource === "albums")) {
+      const facebook = await shareQuietly(resource, saved);
+      if (facebook) {
+        extra.facebook = facebook;
+        if (facebook.posted) {
+          saved.facebookPosted = true;
+          saved.facebookUrl = facebook.url;
+        }
+      }
+    }
+    return sendJson(res, req.method === "POST" ? 201 : 200, { ...saved, ...extra });
   }
   await r.remove(id);
   return sendJson(res, 200, { ok: true });

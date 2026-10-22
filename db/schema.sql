@@ -8,6 +8,8 @@
 --          site_settings, images (uploaded photos)
 -- Phase 3: drive_connection, drive_folders (organized copy of
 --          every uploaded photo in Google Drive)
+-- Phase 4: facebook_connection, facebook_page_choices, and
+--          facebook_post_id on news/albums (posting to the Page)
 -- =========================================================
 
 CREATE TABLE IF NOT EXISTS admins (
@@ -48,6 +50,7 @@ CREATE TABLE IF NOT EXISTS news (
   image         VARCHAR(500) NOT NULL DEFAULT '',
   is_poster     TINYINT(1) NOT NULL DEFAULT 0,
   facebook_url  VARCHAR(500) NOT NULL DEFAULT '',
+  facebook_post_id VARCHAR(128) NULL,
   status        ENUM('draft', 'published') NOT NULL DEFAULT 'draft',
   created_by    VARCHAR(254) NOT NULL DEFAULT '',
   updated_by    VARCHAR(254) NOT NULL DEFAULT '',
@@ -79,6 +82,8 @@ CREATE TABLE IF NOT EXISTS albums (
   category    VARCHAR(60) NOT NULL DEFAULT '',
   date        DATE NOT NULL,
   featured    TINYINT(1) NOT NULL DEFAULT 0,
+  facebook_url      VARCHAR(500) NOT NULL DEFAULT '',
+  facebook_post_id  VARCHAR(128) NULL,
   status      ENUM('draft', 'published') NOT NULL DEFAULT 'draft',
   created_by  VARCHAR(254) NOT NULL DEFAULT '',
   updated_by  VARCHAR(254) NOT NULL DEFAULT '',
@@ -135,4 +140,29 @@ CREATE TABLE IF NOT EXISTS drive_folders (
   path            VARCHAR(255) NOT NULL,
   folder_id       VARCHAR(128) NOT NULL,
   PRIMARY KEY (root_folder_id, path)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- The Facebook Page that receives posts (one row at most).
+-- Set from the admin: Settings > Facebook Page > Connect / Switch Page.
+-- page_token is encrypted with SESSION_SECRET.
+CREATE TABLE IF NOT EXISTS facebook_connection (
+  id            TINYINT UNSIGNED NOT NULL DEFAULT 1,
+  page_id       VARCHAR(64) NOT NULL,
+  page_name     VARCHAR(200) NOT NULL DEFAULT '',
+  page_token    TEXT NOT NULL,
+  user_name     VARCHAR(120) NOT NULL DEFAULT '',
+  connected_by  VARCHAR(254) NOT NULL DEFAULT '',
+  connected_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Pages to choose from right after logging in (when the account manages several). Cleared after choosing.
+CREATE TABLE IF NOT EXISTS facebook_page_choices (
+  page_id     VARCHAR(64) NOT NULL,
+  page_name   VARCHAR(200) NOT NULL DEFAULT '',
+  page_token  TEXT NOT NULL,
+  user_name   VARCHAR(120) NOT NULL DEFAULT '',
+  chosen_by   VARCHAR(254) NOT NULL DEFAULT '',
+  created_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (page_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

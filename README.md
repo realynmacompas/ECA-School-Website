@@ -96,6 +96,7 @@ api/
   content.js   /api/content: everything the public site shows (published only)
   image.js     /api/image?id=: uploaded photos
   drive/[action].js  Google Drive: connect, callback, status, sync, disconnect
+  facebook/[action].js  Facebook Page: connect, callback, status, select, disconnect
   health.js    /api/health: is everything set up?
 db/schema.sql  database tables
 scripts/       db.js (tables + staff list), dev-server.js (local testing)
@@ -105,7 +106,8 @@ scripts/       db.js (tables + staff list), dev-server.js (local testing)
 ### Settings
 
 All accounts and passwords are **settings, not code** (see `.env.example`):
-`GOOGLE_CLIENT_ID`, `SESSION_SECRET`, `SESSION_HOURS`, `DATABASE_URL`, `DATABASE_CA_CERT`.
+`GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `FACEBOOK_APP_ID`, `FACEBOOK_APP_SECRET`,
+`SESSION_SECRET`, `SESSION_HOURS`, `DATABASE_URL`, `DATABASE_CA_CERT`.
 
 - On Vercel: Project > Settings > Environment Variables
 - On your computer: a `.env.local` file (never committed)
@@ -170,6 +172,30 @@ the public pages. Photos deleted on the website stay in Drive.
 **Switch account**, choose the school's Google account, then **Copy photos to Drive**.
 (If the school uses its own Google Cloud project too, also change `GOOGLE_CLIENT_ID`,
 `GOOGLE_CLIENT_SECRET` in Vercel and the Client ID in `admin/js/auth-config.js`.)
+
+### Facebook Page (posting)
+
+On the News and Album forms, **"Also post to the school's Facebook page"** posts the item
+to the connected Page when it is **published** (text, photos and a "Read more" link to the
+website). Each item is posted once; later edits don't change the Facebook post. If Facebook
+fails, the website save still works and the admin sees a warning.
+
+- **Which Page:** whoever clicks **Settings > Facebook Page > Connect** and picks a Page they
+  manage. No Page is written in the code or in Vercel.
+- **Server settings:** `FACEBOOK_APP_ID`, `FACEBOOK_APP_SECRET` (secret). The Page key is
+  stored encrypted with `SESSION_SECRET` (changing it = reconnect Facebook).
+  Links in posts use `SITE_URL` (default `https://eca-school-website.vercel.app`).
+- **Meta set-up (once):** Meta for Developers > create an app with the use case
+  **Manage everything on your Page** (permissions `pages_show_list`, `pages_read_engagement`,
+  `pages_manage_posts`). Add the Valid OAuth Redirect URIs
+  `https://eca-school-website.vercel.app/api/facebook/callback` (and
+  `http://localhost:5500/api/facebook/callback` for testing).
+- The app can stay in **Development mode**: only people with a role on the app can connect,
+  which is what we want. No App Review is needed for that.
+
+**Handing over to the school's Page:** in Meta for Developers add the school's Page admin
+to the app (App roles), then they sign in to this admin, open **Settings**, click
+**Switch Page** and pick the school's Page.
 
 ## Admin sign-in (Google)
 
