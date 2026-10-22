@@ -157,7 +157,7 @@ function updatePinHint() {
   const hint = document.getElementById("featuredHint");
   const isFull = state.otherPinned >= HOMEPAGE_ALBUM_SPOTS;
 
-  // Can't pin a 5th album, but an album that is already pinned can always be unpinned
+  // Can't pin more than HOMEPAGE_ALBUM_SPOTS albums, but a pinned album can always be unpinned
   fields.featured.disabled = isFull && !fields.featured.checked;
 
   if (fields.featured.disabled) {

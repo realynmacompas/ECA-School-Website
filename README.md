@@ -92,6 +92,9 @@ The `api/` folder is the back end. Vercel runs each file as a web address
 api/
   _lib/        config, MySQL connection, session cookie, Google check, helpers
   auth/        login.js, me.js, logout.js
+  admin/[resource].js  admin content: /api/admin/news, events, albums, announcements
+  content.js   /api/content: everything the public site shows (published only)
+  image.js     /api/image?id=: uploaded photos
   health.js    /api/health: is everything set up?
 db/schema.sql  database tables
 scripts/       db.js (tables + staff list), dev-server.js (local testing)
@@ -117,6 +120,7 @@ Needs Node.js 20.6 or newer.
 npm install
 copy .env.example .env.local     (then fill it in)
 npm run db:setup                 creates the tables
+npm run db:seed                  adds the sample content (only into empty tables)
 npm run admin:add -- you@gmail.com
 npm run dev                      → http://localhost:5500
 ```
@@ -131,6 +135,18 @@ npm run admin:add -- name@gmail.com
 npm run admin:remove -- name@gmail.com
 npm run admin:list
 ```
+
+### Content (news, events, albums, announcements)
+
+All content lives in MySQL. Pages read and save it only through `admin/js/store.js`:
+public pages get published content from `/api/content` (one request, cached by Vercel
+for 15 seconds, so admin changes appear within about 15 seconds); admin pages use
+`/api/admin/...` (signed-in staff only, drafts included). The server re-checks every
+rule the admin forms check (required fields, lengths, dates, links, photo types and
+sizes, 4 photos per album, 6 homepage pins).
+
+Uploaded photos are shrunk in the browser (max 1200px), stored in the `images` table and
+shown as `api/image?id=123`. Phase 3 moves new photos to Google Drive.
 
 ## Admin sign-in (Google)
 

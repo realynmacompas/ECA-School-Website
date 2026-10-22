@@ -12,7 +12,7 @@ const statusButtons = document.querySelectorAll(".segmented__btn");
 
 const state = {
   allAlbums: [],
-  homepageIds: [],   // ids of the 4 albums the homepage shows
+  homepageIds: [],   // ids of the albums the homepage shows (up to HOMEPAGE_ALBUM_SPOTS)
   status: "all",     // "all" | "published" | "draft"
   search: "",
   page: 1

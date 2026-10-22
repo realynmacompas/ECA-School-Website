@@ -23,12 +23,18 @@ const TYPES = {
   ".webp": "image/webp", ".svg": "image/svg+xml", ".ico": "image/x-icon", ".md": "text/plain; charset=utf-8"
 };
 
-// Same rules as Vercel: api/foo/bar.js answers /api/foo/bar; files/folders starting with "_" are private
+// Same rules as Vercel: api/foo/bar.js answers /api/foo/bar; files/folders starting with "_" are private;
+// a file named like api/admin/[resource].js answers any /api/admin/<name>
 async function findApiFile(urlPath) {
   const parts = urlPath.replace(/^\/api\/?/, "").split("/").filter(Boolean);
   if (!parts.length || parts.some((p) => p.startsWith("_") || p.startsWith(".") || p.includes(".."))) return null;
-  const file = path.join(root, "api", ...parts) + ".js";
-  try { await fs.access(file); return file; } catch { return null; }
+  const exact = path.join(root, "api", ...parts) + ".js";
+  try { await fs.access(exact); return exact; } catch { /* try a [name].js file */ }
+  const dir = path.join(root, "api", ...parts.slice(0, -1));
+  try {
+    const dynamic = (await fs.readdir(dir)).find((f) => /^\[[\w-]+\]\.js$/.test(f));
+    return dynamic ? path.join(dir, dynamic) : null;
+  } catch { return null; }
 }
 
 async function serveStatic(urlPath, res) {

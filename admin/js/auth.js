@@ -48,7 +48,7 @@ async function adminApi(path, { method = "GET", body } = {}) {
   if (!response.ok) {
     let message = data.error || "Something went wrong. Please try again.";
     // Opened with Live Server, which can't run the /api back end
-    if (response.status === 404 || response.status === 405) {
+    if ((response.status === 404 || response.status === 405) && !data.error) {
       message = "The admin back end isn't running here. On your computer, use \"npm run dev\" instead of Live Server.";
     }
     throw new AdminApiError(message, response.status, data.code);
