@@ -12,7 +12,8 @@ const NAV_ITEMS = [
   { id: "news",          label: "News",               short: "News",   href: "news.html",          icon: "news" },
   { id: "events",        label: "Events",             short: "Events", href: "events.html",        icon: "calendar" },
   { id: "albums",        label: "Albums",             short: "Albums", href: "albums.html",        icon: "photo" },
-  { id: "announcements", label: "Announcements",      short: "Alerts", href: "announcements.html", icon: "megaphone" }
+  { id: "announcements", label: "Announcements",      short: "Alerts", href: "announcements.html", icon: "megaphone" },
+  { id: "settings",      label: "Settings",           short: "Settings", href: "settings.html",    icon: "settings" }
 ];
 
 // Simple outline icons (stroke = currentColor, so they follow the text color)
@@ -22,6 +23,8 @@ const ICONS = {
   calendar: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
   photo: '<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-9 9"/>',
   megaphone: '<path d="M3 11v2h3l6 5V6L6 11z"/><path d="M16 9a4 4 0 0 1 0 6"/>',
+  settings: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>',
+  drive: '<path d="M8 3h8l6 10-4 7H6l-4-7z"/><path d="m8 3 6 10H2M16 3l-6 10 4 7"/>',
   external: '<path d="M14 3h7v7M21 3l-9 9M19 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h5"/>'
 };
 

@@ -23,6 +23,8 @@ export function sessionHours() {
 export function configStatus() {
   return {
     googleClientId: Boolean(process.env.GOOGLE_CLIENT_ID),
+    // Only needed for Google Drive (Phase 3); the site works without it
+    googleClientSecret: process.env.GOOGLE_CLIENT_SECRET ? true : "not set (Google Drive off)",
     sessionSecret: Boolean(process.env.SESSION_SECRET),
     databaseUrl: Boolean(process.env.DATABASE_URL),
     // Aiven (and most hosted MySQL) need the CA certificate; a local database with DATABASE_SSL=off doesn't

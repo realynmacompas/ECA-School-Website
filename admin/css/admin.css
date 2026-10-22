@@ -295,7 +295,7 @@ p { margin: 0; }
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 50;
   height: 68px; padding-bottom: env(safe-area-inset-bottom);
   background: var(--white); border-top: 1px solid var(--cream-200);
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
 }
 .tabbar__link {
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
@@ -1127,3 +1127,29 @@ summary:focus-visible { outline: 3px solid var(--gold-500); outline-offset: 3px;
 .sidebar__user { flex-wrap: wrap; }
 .sidebar__user-name span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .sidebar__logout { flex-basis: 100%; border: 1px solid rgba(245, 215, 126, .3); }
+
+/* =========================================================
+   Settings page (Google Drive)
+   ========================================================= */
+.settings-grid { display: grid; gap: 20px; max-width: 860px; }
+.drive-card { gap: 16px; }
+.drive-card__head { display: flex; align-items: center; gap: 14px; }
+.drive-card__icon { display: flex; align-items: center; justify-content: center; width: 52px; height: 52px; flex-shrink: 0; border-radius: var(--radius-sm); background: #e8f0fe; color: #1a5fd0; }
+.drive-card__status { display: flex; align-items: center; gap: 8px; font-weight: 700; }
+.drive-card__status .dot { flex-shrink: 0; }
+.drive-facts { display: grid; grid-template-columns: 160px minmax(0, 1fr); gap: 8px 16px; margin: 0; }
+.drive-facts dt { color: var(--muted); }
+.drive-facts dd { margin: 0; font-weight: 600; overflow-wrap: anywhere; }
+.drive-progress { height: 8px; border-radius: 4px; background: var(--cream-200); overflow: hidden; }
+.drive-progress span { display: block; height: 100%; width: 0; background: var(--green); transition: width .3s; }
+.drive-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.drive-actions [hidden],
+.drive-facts[hidden],
+.drive-progress[hidden] { display: none; }
+.drive-help { font-size: .95rem; color: var(--muted); }
+.drive-help ol { margin: 6px 0 0; padding-left: 20px; }
+@media (max-width: 560px) {
+  .drive-facts { grid-template-columns: 1fr; gap: 2px; }
+  .drive-facts dd { margin-bottom: 8px; }
+  .drive-actions .btn { flex: 1 1 100%; }
+}

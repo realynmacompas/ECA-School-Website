@@ -95,6 +95,7 @@ api/
   admin/[resource].js  admin content: /api/admin/news, events, albums, announcements
   content.js   /api/content: everything the public site shows (published only)
   image.js     /api/image?id=: uploaded photos
+  drive/[action].js  Google Drive: connect, callback, status, sync, disconnect
   health.js    /api/health: is everything set up?
 db/schema.sql  database tables
 scripts/       db.js (tables + staff list), dev-server.js (local testing)
@@ -146,7 +147,29 @@ rule the admin forms check (required fields, lengths, dates, links, photo types 
 sizes, 4 photos per album, 6 homepage pins).
 
 Uploaded photos are shrunk in the browser (max 1200px), stored in the `images` table and
-shown as `api/image?id=123`. Phase 3 moves new photos to Google Drive.
+shown as `api/image?id=123`. Each one also gets an organized copy in Google Drive (below).
+
+### Google Drive (photo archive)
+
+Every uploaded photo is copied to the connected Google Drive, in folders like
+`ECA Website / News / 2026-10 Foundation Day` and `ECA Website / Albums / 2026-10 Sports Fest`.
+The website keeps showing photos from its own database, so Drive problems never break
+the public pages. Photos deleted on the website stay in Drive.
+
+- **Which Drive:** whoever clicks **Settings > Google Drive > Connect** in the admin and
+  signs in with Google. No account is written in the code or in Vercel.
+- **Permission:** `drive.file` only: the website sees only files it created, nothing else.
+- **Server settings:** `GOOGLE_CLIENT_SECRET` (secret, Vercel + `.env.local` only).
+  The Drive key is stored encrypted with `SESSION_SECRET` (changing it = reconnect Drive).
+- **Google Cloud set-up (once):** enable the **Google Drive API**; in the OAuth client add
+  Authorized redirect URIs `https://eca-school-website.vercel.app/api/drive/callback` and
+  `http://localhost:5500/api/drive/callback`; under Audience click **Publish app**
+  (in "Testing", Google stops the Drive access after 7 days).
+
+**Handing over to the school's account:** sign in to the admin, open **Settings**, click
+**Switch account**, choose the school's Google account, then **Copy photos to Drive**.
+(If the school uses its own Google Cloud project too, also change `GOOGLE_CLIENT_ID`,
+`GOOGLE_CLIENT_SECRET` in Vercel and the Client ID in `admin/js/auth-config.js`.)
 
 ## Admin sign-in (Google)
 
