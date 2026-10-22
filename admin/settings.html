@@ -65,6 +65,50 @@
             <p style="margin-top: 6px;">The website only sees the files it creates in that Drive. Photos deleted from the website stay in Drive.</p>
           </div>
         </section>
+
+        <!-- ===== Facebook Page (filled in by js/settings.js) ===== -->
+        <section class="card drive-card" aria-labelledby="fbTitle">
+          <div class="drive-card__head">
+            <span class="drive-card__icon drive-card__icon--fb" aria-hidden="true">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 21v-7.5h2.5l.4-3h-2.9V8.6c0-.9.3-1.5 1.5-1.5h1.5V4.4c-.3 0-1.2-.1-2.2-.1-2.2 0-3.8 1.4-3.8 3.9v2.3H8v3h2.5V21z"/></svg>
+            </span>
+            <div>
+              <h2 class="card__title" id="fbTitle">Facebook Page</h2>
+              <p class="field__hint">News and albums can also be posted to this Page when you publish them.</p>
+            </div>
+          </div>
+
+          <p class="drive-card__status" id="fbStatus"><span class="dot dot--off" aria-hidden="true"></span>Loading…</p>
+
+          <!-- Shown after logging in with an account that manages several Pages -->
+          <form class="fb-choose" id="fbChoose" hidden>
+            <p class="field__label">Which Page should the website post to?</p>
+            <div class="fb-choose__list" id="fbChoices"></div>
+            <button type="submit" class="btn btn--primary">Use this Page</button>
+          </form>
+
+          <dl class="drive-facts" id="fbFacts" hidden>
+            <dt>Posting to</dt><dd><a id="fbPage" target="_blank" rel="noopener"></a></dd>
+            <dt>Facebook account</dt><dd id="fbUser"></dd>
+            <dt>Connected</dt><dd id="fbConnected"></dd>
+          </dl>
+
+          <div class="drive-actions">
+            <a class="btn btn--primary" id="fbConnectButton" href="/api/facebook/connect" hidden>Connect Facebook Page</a>
+            <a class="btn btn--outline" id="fbSwitchButton" href="/api/facebook/connect" hidden>Switch Page</a>
+            <button type="button" class="btn btn--danger" id="fbDisconnectButton" hidden>Disconnect</button>
+          </div>
+
+          <div class="drive-help">
+            <strong>Handing over to the school's Page</strong>
+            <ol>
+              <li>In Meta for Developers, add the school's Page admin to the app (App roles &gt; Add people).</li>
+              <li>They sign in to this admin, open <strong>Settings</strong>, click <strong>Switch Page</strong>.</li>
+              <li>They log in to Facebook and pick the school's Page.</li>
+            </ol>
+            <p style="margin-top: 6px;">Posts made earlier stay on the old Page. Only posts published with "Also post to the school's Facebook page" ticked are sent, once each.</p>
+          </div>
+        </section>
       </div>
     </main>
 

@@ -49,6 +49,15 @@ else say(/^GOCSPX-/.test(driveSecret) || driveSecret.length >= 20, /^GOCSPX-/.te
   ? `GOOGLE_CLIENT_SECRET loaded (${driveSecret.length} characters)`
   : "GOOGLE_CLIENT_SECRET looks too short. Copy the whole secret (it starts with GOCSPX-)");
 
+// Facebook (Phase 4): optional, needed for Settings > Facebook Page
+const fbId = loaded.FACEBOOK_APP_ID || "";
+const fbSecret = loaded.FACEBOOK_APP_SECRET || "";
+if (!fbId && !fbSecret) console.log("- FACEBOOK_APP_ID / FACEBOOK_APP_SECRET not set (Facebook posting is off; that's OK)");
+else {
+  say(/^\d{6,20}$/.test(fbId), /^\d{6,20}$/.test(fbId) ? `FACEBOOK_APP_ID loaded (${fbId.length} digits)` : "FACEBOOK_APP_ID should be only digits (Meta app > App settings > Basic > App ID)");
+  say(/^[a-f0-9]{32}$/i.test(fbSecret), /^[a-f0-9]{32}$/i.test(fbSecret) ? "FACEBOOK_APP_SECRET loaded (32 characters)" : "FACEBOOK_APP_SECRET should be 32 letters/numbers (App settings > Basic > App secret > Show)");
+}
+
 // DATABASE_URL details
 const w = written.DATABASE_URL || "";
 const v = loaded.DATABASE_URL || "";

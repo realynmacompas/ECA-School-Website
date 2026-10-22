@@ -80,7 +80,11 @@ async function seed() {
 const UPGRADES = [
   { table: "images", column: "drive_file_id", sql: "ALTER TABLE images ADD COLUMN drive_file_id VARCHAR(128) NULL AFTER bytes" },
   { table: "images", column: "drive_account", sql: "ALTER TABLE images ADD COLUMN drive_account VARCHAR(254) NULL AFTER drive_file_id" },
-  { table: "images", column: "drive_synced_at", sql: "ALTER TABLE images ADD COLUMN drive_synced_at DATETIME NULL AFTER drive_account" }
+  { table: "images", column: "drive_synced_at", sql: "ALTER TABLE images ADD COLUMN drive_synced_at DATETIME NULL AFTER drive_account" },
+  // Phase 4: Facebook
+  { table: "news", column: "facebook_post_id", sql: "ALTER TABLE news ADD COLUMN facebook_post_id VARCHAR(128) NULL AFTER facebook_url" },
+  { table: "albums", column: "facebook_url", sql: "ALTER TABLE albums ADD COLUMN facebook_url VARCHAR(500) NOT NULL DEFAULT '' AFTER featured" },
+  { table: "albums", column: "facebook_post_id", sql: "ALTER TABLE albums ADD COLUMN facebook_post_id VARCHAR(128) NULL AFTER facebook_url" }
 ];
 
 async function upgradeTables() {

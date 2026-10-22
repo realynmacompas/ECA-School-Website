@@ -28,6 +28,7 @@ function showSavedMessageFromUrl() {
   };
   const saved = params.get("saved");
   if (messages[saved]) showToast(messages[saved], saved === "draft" ? "info" : "success");
+  showFacebookResultFromUrl(params);
   if (saved) history.replaceState(null, "", "albums.html");
 }
 
