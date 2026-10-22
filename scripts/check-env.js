@@ -41,6 +41,14 @@ for (const name of REQUIRED) {
   else say(true, `${name} loaded (${value.length} characters)`);
 }
 
+// Google Drive (Phase 3): needed for Settings > Connect Google Drive
+const driveSecret = loaded.GOOGLE_CLIENT_SECRET || "";
+if (!("GOOGLE_CLIENT_SECRET" in written)) say(false, "GOOGLE_CLIENT_SECRET is missing (needed for Google Drive). Add GOOGLE_CLIENT_SECRET=... from the Google Cloud client page");
+else if (!driveSecret) say(false, "GOOGLE_CLIENT_SECRET is in the file but Node reads it as EMPTY");
+else say(/^GOCSPX-/.test(driveSecret) || driveSecret.length >= 20, /^GOCSPX-/.test(driveSecret) || driveSecret.length >= 20
+  ? `GOOGLE_CLIENT_SECRET loaded (${driveSecret.length} characters)`
+  : "GOOGLE_CLIENT_SECRET looks too short. Copy the whole secret (it starts with GOCSPX-)");
+
 // DATABASE_URL details
 const w = written.DATABASE_URL || "";
 const v = loaded.DATABASE_URL || "";

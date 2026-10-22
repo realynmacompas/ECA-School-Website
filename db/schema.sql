@@ -5,8 +5,9 @@
 --
 -- Phase 1: admins (the staff allowed into the admin)
 -- Phase 2: news, events, albums, album_photos, announcements,
---          site_settings, images (uploaded photos; Phase 3 moves
---          new photos to Google Drive)
+--          site_settings, images (uploaded photos)
+-- Phase 3: drive_connection, drive_folders (organized copy of
+--          every uploaded photo in Google Drive)
 -- =========================================================
 
 CREATE TABLE IF NOT EXISTS admins (
@@ -22,11 +23,15 @@ CREATE TABLE IF NOT EXISTS admins (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Uploaded photos. Pages show them as  api/image?id=123
+-- drive_*: where the organized copy is in Google Drive (empty = not copied yet)
 CREATE TABLE IF NOT EXISTS images (
-  id          INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  mime        VARCHAR(40) NOT NULL,
-  data        MEDIUMBLOB NOT NULL,
-  bytes       INT UNSIGNED NOT NULL,
+  id               INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  mime             VARCHAR(40) NOT NULL,
+  data             MEDIUMBLOB NOT NULL,
+  bytes            INT UNSIGNED NOT NULL,
+  drive_file_id    VARCHAR(128) NULL,
+  drive_account    VARCHAR(254) NULL,
+  drive_synced_at  DATETIME NULL,
   created_by  VARCHAR(254) NOT NULL DEFAULT '',
   created_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id)
@@ -109,4 +114,25 @@ CREATE TABLE IF NOT EXISTS site_settings (
   name   VARCHAR(64) NOT NULL,
   value  VARCHAR(500) NOT NULL DEFAULT '',
   PRIMARY KEY (name)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- The Google account whose Drive receives the photos (one row at most).
+-- Set from the admin: Settings > Google Drive > Connect / Switch account.
+-- refresh_token is encrypted with SESSION_SECRET.
+CREATE TABLE IF NOT EXISTS drive_connection (
+  id              TINYINT UNSIGNED NOT NULL DEFAULT 1,
+  email           VARCHAR(254) NOT NULL,
+  refresh_token   TEXT NOT NULL,
+  root_folder_id  VARCHAR(128) NOT NULL,
+  connected_by    VARCHAR(254) NOT NULL DEFAULT '',
+  connected_at    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Remembers Drive folder ids ("News/2026-10 Foundation Day") so they aren't looked up every time
+CREATE TABLE IF NOT EXISTS drive_folders (
+  root_folder_id  VARCHAR(128) NOT NULL,
+  path            VARCHAR(255) NOT NULL,
+  folder_id       VARCHAR(128) NOT NULL,
+  PRIMARY KEY (root_folder_id, path)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

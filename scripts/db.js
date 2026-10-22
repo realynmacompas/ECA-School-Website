@@ -26,6 +26,7 @@ async function setup() {
     .split("\n").filter((line) => !line.trim().startsWith("--")).join("\n")
     .split(";").map((s) => s.trim()).filter(Boolean);
   for (const statement of statements) await getPool().query(statement);
+  await upgradeTables();
   console.log(`Done: ${statements.length} table(s) checked/created.`);
 }
 
@@ -73,6 +74,25 @@ async function seed() {
     await query("INSERT IGNORE INTO site_settings (name, value) VALUES ('announcements_enabled', ?)", [SEED_DATA.announcements.enabled ? "1" : "0"]);
     console.log(`✓ Announcements: ${SEED_DATA.announcements.messages.length} sample messages added.`);
   } else console.log("- Announcements already has messages; left as is.");
+}
+
+// Columns added after a table already existed (CREATE TABLE IF NOT EXISTS doesn't add them)
+const UPGRADES = [
+  { table: "images", column: "drive_file_id", sql: "ALTER TABLE images ADD COLUMN drive_file_id VARCHAR(128) NULL AFTER bytes" },
+  { table: "images", column: "drive_account", sql: "ALTER TABLE images ADD COLUMN drive_account VARCHAR(254) NULL AFTER drive_file_id" },
+  { table: "images", column: "drive_synced_at", sql: "ALTER TABLE images ADD COLUMN drive_synced_at DATETIME NULL AFTER drive_account" }
+];
+
+async function upgradeTables() {
+  for (const u of UPGRADES) {
+    const [[{ n }]] = await getPool().query(
+      "SELECT COUNT(*) AS n FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ?",
+      [u.table, u.column]);
+    if (Number(n) === 0) {
+      await getPool().query(u.sql);
+      console.log(`✓ Upgraded table ${u.table}: added ${u.column}`);
+    }
+  }
 }
 
 function emailsFromArgs(args) {

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Settings | ECA Website Admin</title>
+  <link rel="icon" type="image/png" href="../assets/images/favicon.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body data-page="settings">
+  <div class="admin">
+    <aside class="sidebar" id="sidebar"></aside>
+    <header class="mobilebar" id="mobileBar"></header>
+
+    <main class="main" id="main">
+      <div class="page-head">
+        <div>
+          <h1 class="page-title">Settings</h1>
+          <p class="page-head__sub">Connections used by the website.</p>
+        </div>
+      </div>
+
+      <div class="settings-grid">
+        <!-- ===== Google Drive (filled in by js/settings.js) ===== -->
+        <section class="card drive-card" aria-labelledby="driveTitle">
+          <div class="drive-card__head">
+            <span class="drive-card__icon" aria-hidden="true">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3h8l6 10-4 7H6l-4-7z"/><path d="m8 3 6 10H2M16 3l-6 10 4 7"/></svg>
+            </span>
+            <div>
+              <h2 class="card__title" id="driveTitle">Google Drive</h2>
+              <p class="field__hint">Every photo uploaded in the admin also gets an organized copy in Google Drive.</p>
+            </div>
+          </div>
+
+          <p class="drive-card__status" id="driveStatus"><span class="dot dot--off" aria-hidden="true"></span>Loading…</p>
+
+          <dl class="drive-facts" id="driveFacts" hidden>
+            <dt>Saving to</dt><dd id="driveEmail"></dd>
+            <dt>Main folder</dt><dd><a id="driveFolder" target="_blank" rel="noopener"></a></dd>
+            <dt>Connected</dt><dd id="driveConnected"></dd>
+            <dt>Photos in this Drive</dt><dd id="drivePhotos"></dd>
+          </dl>
+          <div class="drive-progress" id="driveProgress" hidden aria-hidden="true"><span></span></div>
+
+          <div class="drive-actions">
+            <a class="btn btn--primary" id="connectButton" href="/api/drive/connect" hidden>Connect Google Drive</a>
+            <button type="button" class="btn btn--dark" id="syncButton" hidden>Copy photos to Drive</button>
+            <a class="btn btn--outline" id="switchButton" href="/api/drive/connect" hidden>Switch account</a>
+            <button type="button" class="btn btn--danger" id="disconnectButton" hidden>Disconnect</button>
+          </div>
+
+          <div class="drive-help">
+            <strong>Handing over to the school's account</strong>
+            <ol>
+              <li>Sign in to this admin, open <strong>Settings</strong>, click <strong>Switch account</strong>.</li>
+              <li>Choose the school's Google account and allow Google Drive.</li>
+              <li>Click <strong>Copy photos to Drive</strong> to put all existing photos in the new Drive.</li>
+            </ol>
+            <p style="margin-top: 6px;">The website only sees the files it creates in that Drive. Photos deleted from the website stay in Drive.</p>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <nav class="tabbar" id="tabbar" aria-label="Admin sections"></nav>
+  </div>
+
+  <script src="js/utils.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/auth-config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/settings.js"></script>
+</body>
+</html>

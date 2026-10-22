@@ -13,6 +13,7 @@
 import { allowMethods, handler, readJsonBody, sendJson, HttpError } from "../_lib/http.js";
 import { requireAdmin } from "../_lib/auth.js";
 import * as content from "../_lib/content.js";
+import { copyToDriveQuietly } from "../_lib/drive.js";
 
 const RESOURCES = {
   news: { list: content.listNews, get: content.getNews, save: content.saveNews, remove: content.deleteNews, name: "news post" },
@@ -43,8 +44,13 @@ export default handler(async (req, res) => {
     if (!item) throw new HttpError(404, `This ${r.name} no longer exists.`, "NOT_FOUND");
     return sendJson(res, 200, item);
   }
-  if (req.method === "POST") return sendJson(res, 201, await r.save(await readJsonBody(req), admin.email));
-  if (req.method === "PUT") return sendJson(res, 200, await r.save(await readJsonBody(req), admin.email, id));
+  if (req.method === "POST" || req.method === "PUT") {
+    const saved = await r.save(await readJsonBody(req), admin.email, req.method === "PUT" ? id : null);
+    // New photos: put an organized copy in Google Drive (if connected). Never blocks the save.
+    const photos = resource === "news" ? [saved.image] : resource === "albums" ? saved.photos : [];
+    const drive = await copyToDriveQuietly(photos);
+    return sendJson(res, req.method === "POST" ? 201 : 200, drive ? { ...saved, drive } : saved);
+  }
   await r.remove(id);
   return sendJson(res, 200, { ok: true });
 });

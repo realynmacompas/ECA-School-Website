@@ -71,3 +71,46 @@ export function setSessionCookie(req, res, token, maxAgeSeconds) {
 export function clearSessionCookie(req, res) {
   setSessionCookie(req, res, "", 0);
 }
+
+/* ---------- Signed short-lived values (e.g. the Google Drive "state") ---------- */
+// Returns "payload.signature"; readSignedValue gives the object back, or null if edited or expired
+export function createSignedValue(data, maxAgeSeconds) {
+  const payloadPart = Buffer.from(JSON.stringify({ ...data, exp: Math.floor(Date.now() / 1000) + maxAgeSeconds })).toString("base64url");
+  return `${payloadPart}.${sign(payloadPart)}`;
+}
+
+export function readSignedValue(value) {
+  const [payloadPart, signature] = String(value || "").split(".");
+  if (!payloadPart || !signature) return null;
+  const expected = Buffer.from(sign(payloadPart));
+  const given = Buffer.from(signature);
+  if (expected.length !== given.length || !crypto.timingSafeEqual(expected, given)) return null;
+  try {
+    const data = JSON.parse(Buffer.from(payloadPart, "base64url").toString("utf8"));
+    return data.exp && data.exp >= Date.now() / 1000 ? data : null;
+  } catch (err) {
+    return null;
+  }
+}
+
+/* ---------- Encrypting secrets stored in the database (AES-256-GCM) ----------
+   Used for the Google Drive key. The encryption key comes from SESSION_SECRET,
+   so changing SESSION_SECRET means connecting Google Drive again. */
+function encryptionKey() {
+  return crypto.createHash("sha256").update(`eca-db-secrets:${requireEnv("SESSION_SECRET")}`).digest();
+}
+
+export function encryptSecret(plainText) {
+  const iv = crypto.randomBytes(12);
+  const cipher = crypto.createCipheriv("aes-256-gcm", encryptionKey(), iv);
+  const data = Buffer.concat([cipher.update(String(plainText), "utf8"), cipher.final()]);
+  return ["v1", iv.toString("base64url"), cipher.getAuthTag().toString("base64url"), data.toString("base64url")].join(".");
+}
+
+export function decryptSecret(stored) {
+  const [version, iv, tag, data] = String(stored || "").split(".");
+  if (version !== "v1" || !iv || !tag || !data) throw new Error("Unreadable secret");
+  const decipher = crypto.createDecipheriv("aes-256-gcm", encryptionKey(), Buffer.from(iv, "base64url"));
+  decipher.setAuthTag(Buffer.from(tag, "base64url"));
+  return Buffer.concat([decipher.update(Buffer.from(data, "base64url")), decipher.final()]).toString("utf8");
+}
