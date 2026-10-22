@@ -10,6 +10,7 @@
     "dev": "node --env-file=.env.local scripts/dev-server.js",
     "env:check": "node scripts/check-env.js",
     "db:setup": "node --env-file=.env.local scripts/db.js setup",
+    "db:seed": "node --env-file=.env.local scripts/db.js seed",
     "admin:add": "node --env-file=.env.local scripts/db.js add-admin",
     "admin:remove": "node --env-file=.env.local scripts/db.js remove-admin",
     "admin:list": "node --env-file=.env.local scripts/db.js list-admins"

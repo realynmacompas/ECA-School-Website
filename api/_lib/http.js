@@ -14,16 +14,17 @@ export class HttpError extends Error {
   }
 }
 
-export function sendJson(res, status, data) {
+// cacheControl: "no-store" by default (admin data must never be cached)
+export function sendJson(res, status, data, cacheControl = "no-store") {
   res.statusCode = status;
   res.setHeader("Content-Type", "application/json; charset=utf-8");
-  res.setHeader("Cache-Control", "no-store"); // admin data must never be cached
+  res.setHeader("Cache-Control", cacheControl);
   res.end(JSON.stringify(data));
 }
 
-const MAX_BODY_BYTES = 1024 * 1024; // 1 MB is plenty for JSON (photos come in Phase 3)
+const MAX_BODY_BYTES = 4 * 1024 * 1024; // Vercel's limit is 4.5 MB; an album with 4 shrunk photos is ~2 MB
 
-export async function readJsonBody(req) {
+export async function readJsonBody(req, maxBytes = MAX_BODY_BYTES) {
   // Vercel already parses JSON bodies into req.body (and throws if the JSON is broken)
   let parsed;
   try {
@@ -39,7 +40,7 @@ export async function readJsonBody(req) {
   const chunks = [];
   for await (const chunk of req) {
     size += chunk.length;
-    if (size > MAX_BODY_BYTES) throw new HttpError(413, "Request is too large.");
+    if (size > maxBytes) throw new HttpError(413, "This is too large to save. Try fewer or smaller photos.");
     chunks.push(chunk);
   }
   return parseJson(Buffer.concat(chunks).toString("utf8"));

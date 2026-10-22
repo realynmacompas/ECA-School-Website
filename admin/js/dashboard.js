@@ -122,17 +122,4 @@ async function loadDashboard() {
   }
 }
 
-document.getElementById("resetDemo").addEventListener("click", async () => {
-  const choice = await confirmDialog({
-    title: "Reset demo content?",
-    message: "All news, events, albums and announcements go back to the original sample data. Your changes will be lost.",
-    confirmText: "Reset",
-    danger: true
-  });
-  if (choice !== "confirm") return;
-  resetDemoData();
-  await loadDashboard();
-  showToast("Demo content was reset.");
-});
-
 loadDashboard();

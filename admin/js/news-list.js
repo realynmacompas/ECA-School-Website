@@ -130,10 +130,10 @@ listEl.addEventListener("click", async (event) => {
   const item = state.allNews.find((n) => n.id === button.dataset.delete);
   if (!item) return;
 
-  const isPublished = album.status === "published";
+  const isPublished = item.status === "published";
   const choice = await confirmDialog({
-    title: "Delete this album?",
-    message: `"${album.title}" and its ${photoCountText(album)} will be removed from the website. This cannot be undone.`
+    title: "Delete this post?",
+    message: `"${item.title}" will be removed from the website. This cannot be undone.`
       + (isPublished ? " To only hide it, move it to Drafts instead." : ""),
     confirmText: "Delete",
     altText: isPublished ? "Move to Drafts" : "",
@@ -144,18 +144,19 @@ listEl.addEventListener("click", async (event) => {
   button.disabled = true;
   try {
     if (choice === "alt") {
-      await saveAlbum({ id: album.id, status: "draft" });
-      album.status = "draft";
-      showToast(`"${album.title}" was moved to Drafts. It's hidden from the website.`, "info");
+      await saveNews({ id: item.id, status: "draft" });
+      item.status = "draft";
+      showToast(`"${item.title}" was moved to Drafts. It's hidden from the website.`, "info");
     } else {
-      await deleteAlbum(album.id);
-      state.allAlbums = state.allAlbums.filter((a) => a.id !== album.id);
-      showToast(`"${album.title}" was deleted.`);
+      await deleteNews(item.id);
+      state.allNews = state.allNews.filter((n) => n.id !== item.id);
+      showToast(`"${item.title}" was deleted.`);
     }
-    renderAll();
+    updateCounts();
+    render();
   } catch (err) {
     button.disabled = false;
-    showToast("Couldn't save the change. Please try again.", "error");
+    showToast(err.message || "Couldn't save the change. Please try again.", "error");
   }
 });
 

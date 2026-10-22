@@ -2,6 +2,7 @@
    Database tool (run on your computer, not on the website)
 
      npm run db:setup                         create the tables (safe to repeat)
+     npm run db:seed                          add the sample content (only into EMPTY tables)
      npm run admin:add -- name@gmail.com      allow someone into the admin
      npm run admin:remove -- name@gmail.com   remove someone's access
      npm run admin:list                       see who has access
@@ -14,6 +15,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { query, getPool, closePool } from "../api/_lib/db.js";
+import { SEED_DATA } from "./seed-data.js";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -25,6 +27,52 @@ async function setup() {
     .split(";").map((s) => s.trim()).filter(Boolean);
   for (const statement of statements) await getPool().query(statement);
   console.log(`Done: ${statements.length} table(s) checked/created.`);
+}
+
+async function isEmpty(table) {
+  const [[{ n }]] = await getPool().query(`SELECT COUNT(*) AS n FROM ${table}`);
+  return Number(n) === 0;
+}
+
+// Sample content, so a new database doesn't start blank. Never overwrites existing posts.
+async function seed() {
+  const by = "sample content";
+  if (await isEmpty("news")) {
+    for (const n of SEED_DATA.news) {
+      await query(`INSERT INTO news (id, title, category, date, summary, body, author, image, is_poster, facebook_url, status, created_by, updated_by)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [n.id, n.title, n.category, n.date, n.summary || "", n.body || "", n.author || "", n.image || "", n.isPoster ? 1 : 0, n.facebookUrl || "", n.status, by, by]);
+    }
+    console.log(`✓ News: ${SEED_DATA.news.length} sample posts added.`);
+  } else console.log("- News already has posts; left as is.");
+
+  if (await isEmpty("events")) {
+    for (const e of SEED_DATA.events) {
+      await query("INSERT INTO events (id, title, start_date, end_date, type, note, created_by, updated_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        [e.id, e.title, e.start, e.end || null, e.type || "activity", e.note || "", by, by]);
+    }
+    console.log(`✓ Events: ${SEED_DATA.events.length} sample events added.`);
+  } else console.log("- Events already has dates; left as is.");
+
+  if (await isEmpty("albums")) {
+    for (const a of SEED_DATA.albums) {
+      await query("INSERT INTO albums (id, title, caption, category, date, featured, status, created_by, updated_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        [a.id, a.title, a.caption || "", a.category || "", a.date, a.featured ? 1 : 0, a.status, by, by]);
+      for (const [position, src] of a.photos.entries()) {
+        await query("INSERT INTO album_photos (album_id, position, src) VALUES (?, ?, ?)", [a.id, position, src]);
+      }
+    }
+    console.log(`✓ Albums: ${SEED_DATA.albums.length} sample albums added.`);
+  } else console.log("- Albums already has albums; left as is.");
+
+  if (await isEmpty("announcements")) {
+    for (const [position, m] of SEED_DATA.announcements.messages.entries()) {
+      await query("INSERT INTO announcements (id, text, link, visible, position) VALUES (?, ?, ?, ?, ?)",
+        [m.id, m.text, m.link || "", m.visible ? 1 : 0, position]);
+    }
+    await query("INSERT IGNORE INTO site_settings (name, value) VALUES ('announcements_enabled', ?)", [SEED_DATA.announcements.enabled ? "1" : "0"]);
+    console.log(`✓ Announcements: ${SEED_DATA.announcements.messages.length} sample messages added.`);
+  } else console.log("- Announcements already has messages; left as is.");
 }
 
 function emailsFromArgs(args) {
@@ -59,10 +107,10 @@ async function listAdmins() {
 }
 
 const [command, ...args] = process.argv.slice(2);
-const commands = { setup, "add-admin": addAdmins, "remove-admin": removeAdmins, "list-admins": listAdmins };
+const commands = { setup, seed, "add-admin": addAdmins, "remove-admin": removeAdmins, "list-admins": listAdmins };
 
 try {
-  if (!commands[command]) throw new Error(`Unknown command "${command || ""}". Use: setup, add-admin, remove-admin, list-admins`);
+  if (!commands[command]) throw new Error(`Unknown command "${command || ""}". Use: setup, seed, add-admin, remove-admin, list-admins`);
   await commands[command](args);
 } catch (err) {
   let message = err.message;

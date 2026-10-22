@@ -129,7 +129,7 @@ function startEditing(ev) {
   fields.title.value = ev.title;
   fields.start.value = ev.start;
   fields.end.value = ev.end || "";
-  fields.type.value = DEFAULT_EVENT_TYPE;
+  fields.type.value = eventType(ev);
   fields.note.value = ev.note || "";
   fields.end.min = ev.start;
   formHeading.textContent = "Edit Event";
