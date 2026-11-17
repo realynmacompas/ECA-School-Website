@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/screenshots/home.jpg" alt="Homepage of the ECA website" width="900">
+  <img src="screenshots/home.jpg" alt="Homepage of the ECA website" width="900">
 </p>
 
 ## What is this?
@@ -29,15 +29,15 @@ a private admin page, so no coding is needed to post news or announcements.
 - Make the text bigger or switch to high contrast for easier reading
 
 <p align="center">
-  <img src="docs/screenshots/news.jpg" alt="News and events page" width="440">
+  <img src="screenshots/news.jpg" alt="News and events page" width="440">
   &nbsp;
-  <img src="docs/screenshots/calendar.jpg" alt="School calendar" width="440">
+  <img src="screenshots/calendar.jpg" alt="School calendar" width="440">
 </p>
 
 ## Works on phones too
 
 <p align="center">
-  <img src="docs/screenshots/phone.jpg" alt="Homepage on a phone" width="260">
+  <img src="screenshots/phone.jpg" alt="Homepage on a phone" width="260">
 </p>
 
 ## For school staff
@@ -51,7 +51,7 @@ Approved staff sign in with their Google account at **`/admin/login.html`** to:
 - Optionally back up photos to Google Drive and share posts to the school's Facebook page
 
 <p align="center">
-  <img src="docs/screenshots/admin-dashboard.jpg" alt="Admin dashboard" width="900">
+  <img src="screenshots/admin-dashboard.jpg" alt="Admin dashboard" width="900">
 </p>
 
 > The sign-in page isn't linked from the public website. Bookmark it, and ask the website
