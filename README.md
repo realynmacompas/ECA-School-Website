@@ -133,10 +133,129 @@ ECA-School-Website/
 
 ---
 
+<<<<<<< HEAD
 ## Getting started
+=======
+## Back end (Vercel Functions + MySQL)
+
+The `api/` folder is the back end. Vercel runs each file as a web address
+(`api/auth/login.js` → `/api/auth/login`); files in `api/_lib/` are shared helpers.
+
+```
+api/
+  _lib/        config, MySQL connection, session cookie, Google check, helpers
+  auth/        login.js, me.js, logout.js
+  admin/[resource].js  admin content: /api/admin/news, events, albums, announcements
+  content.js   /api/content: everything the public site shows (published only)
+  image.js     /api/image?id=: uploaded photos
+  drive/[action].js  Google Drive: connect, callback, status, sync, disconnect
+  facebook/[action].js  Facebook Page: connect, callback, status, select, disconnect
+  health.js    /api/health: is everything set up?
+db/schema.sql  database tables
+scripts/       db.js (tables + staff list), dev-server.js (local testing)
+.env.example   list of settings (copy to .env.local)
+```
+
+### Settings
+
+All accounts and passwords are **settings, not code** (see `.env.example`):
+`GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `FACEBOOK_APP_ID`, `FACEBOOK_APP_SECRET`,
+`SESSION_SECRET`, `SESSION_HOURS`, `DATABASE_URL`, `DATABASE_CA_CERT`.
+
+- On Vercel: Project > Settings > Environment Variables
+- On your computer: a `.env.local` file (never committed)
+
+Switching from personal accounts to the school's later means changing these values,
+then running `npm run db:setup` and `npm run admin:add` on the new database.
+
+### Run it on your computer
+
+Needs Node.js 20.6 or newer.
+
+```
+npm install
+copy .env.example .env.local     (then fill it in)
+npm run db:setup                 creates the tables
+npm run db:seed                  adds the sample content (only into empty tables)
+npm run admin:add -- you@gmail.com
+npm run dev                      → http://localhost:5500
+```
+
+Use `npm run dev`, not VS Code Live Server: Live Server can't run the `/api` back end.
+Check the set-up any time at `/api/health`.
+
+### Staff list
+
+```
+npm run admin:add -- name@gmail.com
+npm run admin:remove -- name@gmail.com
+npm run admin:list
+```
+
+### Content (news, events, albums, announcements)
+
+All content lives in MySQL. Pages read and save it only through `admin/js/store.js`:
+public pages get published content from `/api/content` (one request, cached by Vercel
+for 15 seconds, so admin changes appear within about 15 seconds); admin pages use
+`/api/admin/...` (signed-in staff only, drafts included). The server re-checks every
+rule the admin forms check (required fields, lengths, dates, links, photo types and
+sizes, 4 photos per album, 6 homepage pins).
+
+Uploaded photos are shrunk in the browser (max 1200px), stored in the `images` table and
+shown as `api/image?id=123`. Each one also gets an organized copy in Google Drive (below).
+
+### Google Drive (photo archive)
+
+Every uploaded photo is copied to the connected Google Drive, in folders like
+`ECA Website / News / 2026-10 Foundation Day` and `ECA Website / Albums / 2026-10 Sports Fest`.
+The website keeps showing photos from its own database, so Drive problems never break
+the public pages. Photos deleted on the website stay in Drive.
+
+- **Which Drive:** whoever clicks **Settings > Google Drive > Connect** in the admin and
+  signs in with Google. No account is written in the code or in Vercel.
+- **Permission:** `drive.file` only: the website sees only files it created, nothing else.
+- **Server settings:** `GOOGLE_CLIENT_SECRET` (secret, Vercel + `.env.local` only).
+  The Drive key is stored encrypted with `SESSION_SECRET` (changing it = reconnect Drive).
+- **Google Cloud set-up (once):** enable the **Google Drive API**; in the OAuth client add
+  Authorized redirect URIs `https://eca-school-website.vercel.app/api/drive/callback` and
+  `http://localhost:5500/api/drive/callback`; under Audience click **Publish app**
+  (in "Testing", Google stops the Drive access after 7 days).
+
+**Handing over to the school's account:** sign in to the admin, open **Settings**, click
+**Switch account**, choose the school's Google account, then **Copy photos to Drive**.
+(If the school uses its own Google Cloud project too, also change `GOOGLE_CLIENT_ID`,
+`GOOGLE_CLIENT_SECRET` in Vercel and the Client ID in `admin/js/auth-config.js`.)
+
+### Facebook Page (posting)
+
+On the News and Album forms, **"Also post to the school's Facebook page"** posts the item
+to the connected Page when it is **published** (text, photos and a "Read more" link to the
+website). Each item is posted once; later edits don't change the Facebook post. If Facebook
+fails, the website save still works and the admin sees a warning.
+
+- **Which Page:** whoever clicks **Settings > Facebook Page > Connect** and picks a Page they
+  manage. No Page is written in the code or in Vercel.
+- **Server settings:** `FACEBOOK_APP_ID`, `FACEBOOK_APP_SECRET` (secret). The Page key is
+  stored encrypted with `SESSION_SECRET` (changing it = reconnect Facebook).
+  Links in posts use `SITE_URL` (default `https://eca-school-website.vercel.app`).
+- **Meta set-up (once):** Meta for Developers > create an app with the use case
+  **Manage everything on your Page** (permissions `pages_show_list`, `pages_read_engagement`,
+  `pages_manage_posts`). Add the Valid OAuth Redirect URIs
+  `https://eca-school-website.vercel.app/api/facebook/callback` (and
+  `http://localhost:5500/api/facebook/callback` for testing).
+- The app can stay in **Development mode**: only people with a role on the app can connect,
+  which is what we want. No App Review is needed for that.
+
+**Handing over to the school's Page:** in Meta for Developers add the school's Page admin
+to the app (App roles), then they sign in to this admin, open **Settings**, click
+**Switch Page** and pick the school's Page.
+
+## Admin sign-in (Google)
+>>>>>>> 7cafebc5616a77ceaed5f4cd672a48885a86fa22
 
 ### Requirements
 
+<<<<<<< HEAD
 - [Node.js](https://nodejs.org/) 20.6 or newer
 - A MySQL 8 database (Aiven, or XAMPP on your own computer)
 
@@ -225,12 +344,24 @@ this site. The login page isn't linked from the public website, so staff should 
 <summary><strong>Google Cloud set-up for sign-in</strong></summary>
 
 In **Google Cloud > Credentials**, the OAuth client must list these **Authorized JavaScript origins**:
+=======
+1. Google's button gives the page a signed ID token.
+2. `/api/auth/login` verifies it with Google (signature, expiry, our Client ID) and
+   checks the email in the `admins` table.
+3. The server sets an 8-hour session cookie (`eca_admin`: HttpOnly, SameSite=Lax,
+   Secure on https, signed with `SESSION_SECRET`).
+4. Every admin page asks `/api/auth/me`; removed staff lose access right away.
+
+The front end only needs the Client ID (`admin/js/auth-config.js`). Google Cloud >
+Credentials > the OAuth client must list these **Authorized JavaScript origins**:
+>>>>>>> 7cafebc5616a77ceaed5f4cd672a48885a86fa22
 
 ```
 https://eca-school-website.vercel.app
 http://localhost:5500
 http://127.0.0.1:5500
 ```
+<<<<<<< HEAD
 
 </details>
 
@@ -332,3 +463,5 @@ Pages linked from the site that are not built yet:
   Developed as an IT internship project for Elim Christian Academy, Inc.<br>
   <sub>Photos, logo and school content belong to Elim Christian Academy and may not be reused without permission.</sub>
 </p>
+=======
+>>>>>>> 7cafebc5616a77ceaed5f4cd672a48885a86fa22

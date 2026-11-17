@@ -215,7 +215,7 @@ form.addEventListener("submit", async (event) => {
     author: fields.author.value.trim(),
     facebookUrl: fields.facebookUrl.value.trim(),
     isPoster: fields.isPoster.checked,
-    shareToFacebook: fields.shareToFacebook.checked, // used by the backend later
+    shareToFacebook: fields.shareToFacebook.checked, // posted once, when published (see facebook-share.js)
     image: photo,
     status
   };
@@ -223,10 +223,10 @@ form.addEventListener("submit", async (event) => {
 
   setSaving(true, status);
   try {
-    await saveNews(post);
+    const saved = await saveNews(post);
     hasUnsavedChanges = false;
     const message = status === "draft" ? "draft" : (existingPost ? "updated" : "published");
-    window.location.href = `news.html?saved=${message}`;
+    window.location.href = `news.html?saved=${message}${facebookResultParams(saved)}`;
   } catch (err) {
     formError.textContent = `${err.message || "Couldn't save."} Your work is still here. Please try again.`;
     formError.hidden = false;
@@ -262,6 +262,7 @@ async function init() {
     fields.date.value = todayISO();
     setButtonLabels();
     updatePreview();
+    setupFacebookShare(fields.shareToFacebook, document.getElementById("facebookHint"), null);
     return;
   }
 
@@ -304,6 +305,7 @@ async function init() {
 
   setButtonLabels();
   showPhoto();
+  setupFacebookShare(fields.shareToFacebook, document.getElementById("facebookHint"), existingPost);
 }
 
 init();

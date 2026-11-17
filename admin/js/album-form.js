@@ -157,7 +157,7 @@ function updatePinHint() {
   const hint = document.getElementById("featuredHint");
   const isFull = state.otherPinned >= HOMEPAGE_ALBUM_SPOTS;
 
-  // Can't pin a 5th album, but an album that is already pinned can always be unpinned
+  // Can't pin more than HOMEPAGE_ALBUM_SPOTS albums, but a pinned album can always be unpinned
   fields.featured.disabled = isFull && !fields.featured.checked;
 
   if (fields.featured.disabled) {
@@ -231,7 +231,7 @@ form.addEventListener("submit", async (event) => {
     caption: fields.caption.value.trim(),
     photos: [...state.photos],
     featured: fields.featured.checked,
-    shareToFacebook: fields.shareToFacebook.checked, // used by the backend later
+    shareToFacebook: fields.shareToFacebook.checked, // posted once, when published (see facebook-share.js)
     status
   };
   if (state.existingAlbum) album.id = state.existingAlbum.id;
@@ -240,10 +240,10 @@ form.addEventListener("submit", async (event) => {
   publishButton.disabled = true;
   (status === "draft" ? draftButton : publishButton).textContent = "Saving…";
   try {
-    await saveAlbum(album);
+    const saved = await saveAlbum(album);
     state.hasUnsavedChanges = false;
     const message = status === "draft" ? "draft" : (state.existingAlbum ? "updated" : "published");
-    window.location.href = `albums.html?saved=${message}`;
+    window.location.href = `albums.html?saved=${message}${facebookResultParams(saved)}`;
   } catch (err) {
     formError.textContent = `${err.message || "Couldn't save."} Your work is still here. Please try again.`;
     formError.hidden = false;
@@ -308,6 +308,7 @@ async function init() {
   setButtonLabels();
   updatePinHint();
   renderPhotos();
+  setupFacebookShare(fields.shareToFacebook, document.getElementById("facebookHint"), state.existingAlbum);
 }
 
 init();

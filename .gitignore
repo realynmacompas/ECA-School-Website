@@ -9,3 +9,14 @@ desktop.ini
 # Environment files (for Supabase keys later; never upload these)
 .env
 .env.*
+# ...but the example settings file is safe to share
+!.env.example
+
+# Node.js packages (reinstalled with "npm install")
+node_modules/
+
+# Vercel CLI (local)
+.vercel
+
+# Database certificates downloaded for local testing
+*.pem

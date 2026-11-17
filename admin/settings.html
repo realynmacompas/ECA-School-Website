@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Settings | ECA Website Admin</title>
+  <link rel="icon" type="image/png" href="../assets/images/favicon.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body data-page="settings">
+  <div class="admin">
+    <aside class="sidebar" id="sidebar"></aside>
+    <header class="mobilebar" id="mobileBar"></header>
+
+    <main class="main" id="main">
+      <div class="page-head">
+        <div>
+          <h1 class="page-title">Settings</h1>
+          <p class="page-head__sub">Connections used by the website.</p>
+        </div>
+      </div>
+
+      <div class="settings-grid">
+        <!-- ===== Google Drive (filled in by js/settings.js) ===== -->
+        <section class="card drive-card" aria-labelledby="driveTitle">
+          <div class="drive-card__head">
+            <span class="drive-card__icon" aria-hidden="true">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3h8l6 10-4 7H6l-4-7z"/><path d="m8 3 6 10H2M16 3l-6 10 4 7"/></svg>
+            </span>
+            <div>
+              <h2 class="card__title" id="driveTitle">Google Drive</h2>
+              <p class="field__hint">Every photo uploaded in the admin also gets an organized copy in Google Drive.</p>
+            </div>
+          </div>
+
+          <p class="drive-card__status" id="driveStatus"><span class="dot dot--off" aria-hidden="true"></span>Loading…</p>
+
+          <dl class="drive-facts" id="driveFacts" hidden>
+            <dt>Saving to</dt><dd id="driveEmail"></dd>
+            <dt>Main folder</dt><dd><a id="driveFolder" target="_blank" rel="noopener"></a></dd>
+            <dt>Connected</dt><dd id="driveConnected"></dd>
+            <dt>Photos in this Drive</dt><dd id="drivePhotos"></dd>
+          </dl>
+          <div class="drive-progress" id="driveProgress" hidden aria-hidden="true"><span></span></div>
+
+          <div class="drive-actions">
+            <a class="btn btn--primary" id="connectButton" href="/api/drive/connect" hidden>Connect Google Drive</a>
+            <button type="button" class="btn btn--dark" id="syncButton" hidden>Copy photos to Drive</button>
+            <a class="btn btn--outline" id="switchButton" href="/api/drive/connect" hidden>Switch account</a>
+            <button type="button" class="btn btn--danger" id="disconnectButton" hidden>Disconnect</button>
+          </div>
+
+          <div class="drive-help">
+            <strong>Handing over to the school's account</strong>
+            <ol>
+              <li>Sign in to this admin, open <strong>Settings</strong>, click <strong>Switch account</strong>.</li>
+              <li>Choose the school's Google account and allow Google Drive.</li>
+              <li>Click <strong>Copy photos to Drive</strong> to put all existing photos in the new Drive.</li>
+            </ol>
+            <p style="margin-top: 6px;">The website only sees the files it creates in that Drive. Photos deleted from the website stay in Drive.</p>
+          </div>
+        </section>
+
+        <!-- ===== Facebook Page (filled in by js/settings.js) ===== -->
+        <section class="card drive-card" aria-labelledby="fbTitle">
+          <div class="drive-card__head">
+            <span class="drive-card__icon drive-card__icon--fb" aria-hidden="true">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 21v-7.5h2.5l.4-3h-2.9V8.6c0-.9.3-1.5 1.5-1.5h1.5V4.4c-.3 0-1.2-.1-2.2-.1-2.2 0-3.8 1.4-3.8 3.9v2.3H8v3h2.5V21z"/></svg>
+            </span>
+            <div>
+              <h2 class="card__title" id="fbTitle">Facebook Page</h2>
+              <p class="field__hint">News and albums can also be posted to this Page when you publish them.</p>
+            </div>
+          </div>
+
+          <p class="drive-card__status" id="fbStatus"><span class="dot dot--off" aria-hidden="true"></span>Loading…</p>
+
+          <!-- Shown after logging in with an account that manages several Pages -->
+          <form class="fb-choose" id="fbChoose" hidden>
+            <p class="field__label">Which Page should the website post to?</p>
+            <div class="fb-choose__list" id="fbChoices"></div>
+            <button type="submit" class="btn btn--primary">Use this Page</button>
+          </form>
+
+          <dl class="drive-facts" id="fbFacts" hidden>
+            <dt>Posting to</dt><dd><a id="fbPage" target="_blank" rel="noopener"></a></dd>
+            <dt>Facebook account</dt><dd id="fbUser"></dd>
+            <dt>Connected</dt><dd id="fbConnected"></dd>
+          </dl>
+
+          <div class="drive-actions">
+            <a class="btn btn--primary" id="fbConnectButton" href="/api/facebook/connect" hidden>Connect Facebook Page</a>
+            <a class="btn btn--outline" id="fbSwitchButton" href="/api/facebook/connect" hidden>Switch Page</a>
+            <button type="button" class="btn btn--danger" id="fbDisconnectButton" hidden>Disconnect</button>
+          </div>
+
+          <div class="drive-help">
+            <strong>Handing over to the school's Page</strong>
+            <ol>
+              <li>In Meta for Developers, add the school's Page admin to the app (App roles &gt; Add people).</li>
+              <li>They sign in to this admin, open <strong>Settings</strong>, click <strong>Switch Page</strong>.</li>
+              <li>They log in to Facebook and pick the school's Page.</li>
+            </ol>
+            <p style="margin-top: 6px;">Posts made earlier stay on the old Page. Only posts published with "Also post to the school's Facebook page" ticked are sent, once each.</p>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <nav class="tabbar" id="tabbar" aria-label="Admin sections"></nav>
+  </div>
+
+  <script src="js/utils.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/auth-config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/settings.js"></script>
+</body>
+</html>

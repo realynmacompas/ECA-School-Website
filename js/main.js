@@ -7,8 +7,8 @@
    5. Scroll reveal and number counters
    6. Upcoming dates
    7. Accessibility options
-   8. Life at ECA (homepage albums) and 
-   9. Load content from the data store.
+   8. Life at ECA (homepage albums)
+   9. Load content from the back end (/api/content, via store.js)
    ========================================================= */
 
 document.documentElement.classList.add("js");
@@ -448,7 +448,7 @@ function renderEvents(schoolEvents) {
 document.getElementById("year").textContent = new Date().getFullYear();
 
 /* =========================================================
-   8. Life at ECA: 4 albums on the homepage
+   8. Life at ECA: up to 6 albums on the homepage
    Which 4 is decided by pickHomepageAlbums() in store.js
    (pinned albums first, then the newest), the same rule the admin shows.
    ========================================================= */
